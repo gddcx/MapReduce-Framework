@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+package MapReduce;
+
+service RequireJob {
+  rpc Require (NodeMessage) returns (Reply) {}
+  rpc Finish (FinishMsg) returns (google.protobuf.Empty) {}
+}
+
+message NodeMessage {
+  bool isBusy = 1;
+}
+
+enum TaskType {
+  map = 0;
+  reduce = 1;
+}
+
+message Reply {
+  TaskType taskType = 1;
+  string fileName = 2;
+}
+
+message FinishMsg {
+  TaskType taskType = 1;
+  string fileName = 2;
+}
+
+service HeartBeat {
+  rpc SendHeartBeat (HeartBeatMsg) returns (HeartBeatReply) {}; 
+}
+
+message HeartBeatMsg {
+  string hostname = 1;
+}
+
+message HeartBeatReply {
+  bool receive = 1;
+}
