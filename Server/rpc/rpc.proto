@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+package masterSlaveRPC;
+
+service JobRpc {
+  rpc RequireJob (NodeMessage) returns (JobMessage) {}
+  rpc FetchDataFromMap(NodeMessage) returns (MapDataList) {}
+  rpc ReportJobStatus(NodeMessage) returns (google.protobuf.Empty) {}
+  rpc ReportEvent(EventMessage) returns (google.protobuf.Empty) {}
+}
+message NodeMessage {
+    string nodeName = 1;
+}
+message JobMessage {
+    enum TaskType {
+        map = 0;
+        reduce = 1;
+        fetch = 2;
+
+    }
+    TaskType type = 1;
+    string key = 2;
+    string value = 3;
+}
+
+message MapDataList {
+    repeated string filename = 1;
+}
+
+message EventMessage {
+}
