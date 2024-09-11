@@ -37,6 +37,7 @@ bool RpcClient::Fetch(NodeMessage& nodeMsg, MapDataList& mapDataList)
     Status status = stub_->FetchDataFromMap(&context, nodeMsg, &mapDataList);
     if(status.ok())
     {
+        std::cout << __func__ << ": Fetch data size:" << mapDataList.filename_size() << std::endl;
         return MR_OK;
     }
     return MR_ERROR;

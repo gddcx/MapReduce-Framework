@@ -18,7 +18,6 @@ message JobMessage {
         map = 0;
         reduce = 1;
         fetch = 2;
-
     }
     TaskType type = 1;
     string key = 2;

@@ -13,7 +13,7 @@ public:
     void SetNodeName(std::string nodeName);
 
 private:
-    void ExecuteJob(JobMessage& jobMsg);
+    void ExecuteJob(JobMessage jobMsg);
     void Partition(std::vector<std::pair<std::string, int>>& mapRes);
     void LoadPartition(const std::string& filename, std::vector<std::pair<std::string, int>>& partition);
     void FetchIntermediaData(MapDataList& mapDataList);

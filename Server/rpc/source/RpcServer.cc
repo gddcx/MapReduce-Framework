@@ -7,28 +7,7 @@ RpcServer::RpcServer()
     rpcListen_ = std::string("0.0.0.0:50031");
 }
 
-RpcServer::RpcServer(std::string& rpcListen): rpcListen_(rpcListen) {}
-
-Status RpcServer::RequireJob(ServerContext* context, const NodeMessage* nodeMsg, JobMessage* jobMsg)
-{
-    if((nodeMsg->nodename() != "") && (GetJobsNum() != 0))
-    {
-        jobMsg->set_type(masterSlaveRPC::JobMessage_TaskType_map);
-    }
-    else /* 客户端忙或者服务端没活，就只记录心跳 */
-    {
-
-    }
-
-    return Status::OK;
-}
-
-Status RpcServer::FetchDataFromMap(ServerContext* context, const NodeMessage* nodeMsg, MapDataList* mapDataList)
-{
-    mapDataList->add_filename("intermedia-0.bin");
-    mapDataList->add_filename("intermedia-1.bin");
-    return Status::OK;
-}
+RpcServer::RpcServer(std::string& rpcListen): rpcListen_(rpcListen){}
 
 void RpcServer::RunRpcServer()
 {
@@ -42,23 +21,64 @@ void RpcServer::RunRpcServer()
     server->Wait();
 }
 
-/* 不合理，为什么是RpcServer保存任务，应该是master负责控制任务 */
-void RpcServer::AddJob(std::string& filename)
+Status RpcServer::RequireJob(ServerContext* context, const NodeMessage* nodeMsg, JobMessage* jobMsg)
 {
-    std::lock_guard<std::mutex> lock(jobsMutex_);
-    jobs_.push(filename);
+    std::string key;
+    std::string value;
+    if(GetMapJobCallback_(nodeMsg->nodename(), key, value) == MR_OK) // 有map工作未启动
+    {
+        jobMsg->set_key(key);
+        jobMsg->set_value(value);
+        jobMsg->set_type(masterSlaveRPC::JobMessage_TaskType_map);
+    }
+    else if(GetReduceJobNumCallback_() != 0)
+    {
+        jobMsg->set_type(masterSlaveRPC::JobMessage_TaskType_reduce);
+    }
+    else
+    {
+        
+    }
+
+    return Status::OK;
 }
 
-std::string RpcServer::GetJob()
+Status RpcServer::ReportJobStatus(ServerContext* context, const NodeMessage* nodeMsg, Empty* response)
 {
-    std::lock_guard<std::mutex> lock(jobsMutex_);
-    std::string job = jobs_.front();
-    jobs_.pop();
+    std::string nodeName = nodeMsg->nodename();
+    ChangeWorkStatusCallback_(nodeName);
 
-    return job;
+    return Status::OK;
 }
 
-uint RpcServer::GetJobsNum()
+Status RpcServer::FetchDataFromMap(ServerContext* context, const NodeMessage* nodeMsg, MapDataList* mapDataList)
 {
-    return jobs_.size();
+    std::stringstream url;
+
+    for(const auto& url: GetIntermediateFileCallback_(nodeMsg->nodename()))
+    {
+        mapDataList->add_filename(url);
+    }
+
+    return Status::OK;
+}
+
+void RpcServer::SetGetMapJobCallback(std::function<bool(std::string, std::string&, std::string&)> GetMapJobCallback)
+{
+    GetMapJobCallback_ = GetMapJobCallback;
+}
+
+void RpcServer::SetGetReduceJobNumCallback(std::function<int()> GetReduceJobNumCallback)
+{
+    GetReduceJobNumCallback_ = GetReduceJobNumCallback;
+}
+
+void RpcServer::SetChangeWorkStatusCallback(std::function<void(std::string&)> ChangeWorkStatusCallback)
+{
+    ChangeWorkStatusCallback_ = ChangeWorkStatusCallback;
+}
+
+void RpcServer::SetGetIntermediateFileCallback(std::function<std::vector<std::string>(std::string)> GetIntermediateFileCallback)
+{
+    GetIntermediateFileCallback_ = GetIntermediateFileCallback;
 }
