@@ -8,6 +8,7 @@ using grpc::Server;
 using grpc::ServerBuilder;
 using grpc::ServerContext;
 using grpc::Status;
+using grpc::StatusCode;
 using masterSlaveRPC::JobRpc;
 using masterSlaveRPC::NodeMessage;
 using masterSlaveRPC::JobMessage;

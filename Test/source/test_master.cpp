@@ -14,6 +14,7 @@ int main(int argc, char* argv[])
         filename = std::string(argv[loop]);
         masterNode.AddJob(filename, startPos);
     }
+    masterNode.SetReduceNodeNum(2);
     masterNode.StartMasterNode();
 
     return 0;

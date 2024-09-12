@@ -51,7 +51,6 @@ void WorkerNode::ExecuteJob(JobMessage jobMsg)
             mapRes.emplace_back("c", 5);
             mapRes.emplace_back("d", 6);
             Partition(mapRes);
-            std::cout << "map job" << std::endl;
             break;
         }
         case JobMessage_TaskType::JobMessage_TaskType_reduce:
@@ -66,7 +65,6 @@ void WorkerNode::ExecuteJob(JobMessage jobMsg)
                 mergePartitions.insert(mergePartitions.end(), partition.begin(), partition.end());
                 std::vector<std::pair<std::string, int>>().swap(partition);
             }
-            std::cout << "reduce job" << std::endl;
             // mrObj_->Reduce(key, mergePartitions);
             break;
         }
@@ -147,7 +145,7 @@ void WorkerNode::StartWorkerNode()
 {
     Timer timer;
     timer.AddTimer(1500, std::bind(&WorkerNode::HeartBeat, this), true); /* 5000ms上报心跳 */
-    timer.AddTimer(2000, std::bind(&WorkerNode::RequireJob, this), false); /* busy不要请求任务 */
+    timer.AddTimer(2000, std::bind(&WorkerNode::RequireJob, this), true); /* busy不要请求任务 */
     for(;;)
     {
         timer.WaitExpired();

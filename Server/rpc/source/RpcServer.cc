@@ -30,24 +30,25 @@ Status RpcServer::RequireJob(ServerContext* context, const NodeMessage* nodeMsg,
         jobMsg->set_key(key);
         jobMsg->set_value(value);
         jobMsg->set_type(masterSlaveRPC::JobMessage_TaskType_map);
+        return Status::OK;
     }
-    else if(GetReduceJobNumCallback_() != 0)
+    else if(GetReduceJobNumCallback_() > 0)
     {
         jobMsg->set_type(masterSlaveRPC::JobMessage_TaskType_reduce);
+        return Status::OK;
     }
     else
     {
         
     }
 
-    return Status::OK;
+    return Status(StatusCode::UNAVAILABLE, "no available job!");
 }
 
 Status RpcServer::ReportJobStatus(ServerContext* context, const NodeMessage* nodeMsg, Empty* response)
 {
     std::string nodeName = nodeMsg->nodename();
     ChangeWorkStatusCallback_(nodeName);
-
     return Status::OK;
 }
 

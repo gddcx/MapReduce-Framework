@@ -26,7 +26,7 @@ void MasterNode::SetReduceNodeNum(int num)
 
 int MasterNode::GetReduceNodeNum()
 {
-    return reduceJobsNum_;
+    return reduceJobsNum_ > 0 ? reduceJobsNum_-- : 0;
 }
 
 void MasterNode::StartMasterNode()
@@ -52,7 +52,7 @@ bool MasterNode::GetJob(std::string nodeName, std::string& key, std::string& val
 
     for(auto& workStatus: jobs_)
     {
-        if(workStatus.status_ != JOB_NO_START)
+        if(workStatus.status_ == JOB_NO_START)
         {
             workStatus.status_ = JOB_RUNNNING;
             workStatus.workerNodeName_ = nodeName;
@@ -92,7 +92,7 @@ std::vector<std::string> MasterNode::GetIntermediateFile(std::string nodeName)
             workStatus->workerNodeName_ = nodeName;
             for(const auto& workStatus: jobs_)
             {
-                url << workStatus.workerNodeName_ << "/" << INTERMEDIATE_FILE_PREFIX << idx << INTERMEDIATE_FILE_PREFIX;
+                url << workStatus.workerNodeName_ << "/" << INTERMEDIATE_FILE_PREFIX << idx << INTERMEDIATE_FILE_SUBFIX;
                 res.push_back(url.str());
                 url.str("");
             }
