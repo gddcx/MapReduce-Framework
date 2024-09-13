@@ -8,9 +8,13 @@ class WorkerNode
 private:
     std::string nodeName_;
     RpcClient* rpcClient_;
+    void* handle_;
     MapReduceBase* mrObj_;
+    MapReduceBase* (*CreateMapReduceInstance)();
+    void (*DestroyMapReduceInstance)(MapReduceBase*);
 public:
     void SetNodeName(std::string nodeName);
+    int LoadCustomizedMapReduce(const std::string& libPath);
 
 private:
     void ExecuteJob(JobMessage jobMsg);
@@ -22,5 +26,5 @@ public:
     void CreateRpcClient(std::string& target);
     void RequireJob();
     void HeartBeat();
-    void StartWorkerNode();
+    void StartWorkerNode(std::string libPath);
 };

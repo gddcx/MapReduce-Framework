@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include "WorkerNode.h"
+#include <dlfcn.h>
 #include "Timer.h"
 #include "public.h"
 #include "MapReduceBase.h"
@@ -10,11 +11,42 @@
 WorkerNode::~WorkerNode()
 {
     if(rpcClient_ != nullptr) delete rpcClient_;
+    if(mrObj_)
+    {
+        DestroyMapReduceInstance(mrObj_);
+    }
+    if(handle_)
+    {
+        dlclose(handle_);
+    }
 }
 
 void WorkerNode::SetNodeName(std::string nodeName)
 {
     nodeName_ = nodeName;
+}
+
+int WorkerNode::LoadCustomizedMapReduce(const std::string& libPath)
+{
+    handle_ = dlopen(libPath.c_str(), RTLD_LAZY);
+    if(!handle_)
+    {
+        std::cout << "fail to load dll" << std::endl;
+        return -1;
+    }
+    CreateMapReduceInstance = (MapReduceBase* (*)()) dlsym(handle_, "CreateMapReduceInstance");
+    if(!CreateMapReduceInstance)
+    {
+        std::cout << "fail to find function:CreateMapReduceInstance" << std::endl;
+        return -1;
+    }
+    DestroyMapReduceInstance = (void (*)(MapReduceBase*)) dlsym(handle_, "DestroyMapReduceInstance");
+    if(!DestroyMapReduceInstance)
+    {
+        std::cout << "fail to find function:DestroyMapReduceInstance" << std::endl;
+        return -1;
+    }
+    mrObj_ = CreateMapReduceInstance();
 }
 
 void WorkerNode::CreateRpcClient(std::string& target)
@@ -45,12 +77,8 @@ void WorkerNode::ExecuteJob(JobMessage jobMsg)
         /* TODO: mrObj_ 初始化*/
         case JobMessage_TaskType::JobMessage_TaskType_map:
         {
-            // mapRes = mrObj_->Map(key, value);
-            mapRes.emplace_back("a", 3);
-            mapRes.emplace_back("b", 4);
-            mapRes.emplace_back("c", 5);
-            mapRes.emplace_back("d", 6);
-            Partition(mapRes);
+            mapRes = mrObj_->Map(key, value);
+            Partition(mapRes); // partition
             break;
         }
         case JobMessage_TaskType::JobMessage_TaskType_reduce:
@@ -65,7 +93,7 @@ void WorkerNode::ExecuteJob(JobMessage jobMsg)
                 mergePartitions.insert(mergePartitions.end(), partition.begin(), partition.end());
                 std::vector<std::pair<std::string, int>>().swap(partition);
             }
-            // mrObj_->Reduce(key, mergePartitions);
+            mrObj_->Reduce(key, mergePartitions);
             break;
         }
         default:
@@ -141,8 +169,14 @@ void WorkerNode::FetchIntermediaData(MapDataList& mapDataList)
 
 void WorkerNode::HeartBeat() {}
 
-void WorkerNode::StartWorkerNode()
+void WorkerNode::StartWorkerNode(std::string libPath)
 {
+    if(LoadCustomizedMapReduce(libPath) == -1)
+    {
+        std::cout << "not found MapReduce dll" << std::endl;
+        return;
+    }
+
     Timer timer;
     timer.AddTimer(1500, std::bind(&WorkerNode::HeartBeat, this), true); /* 5000ms上报心跳 */
     timer.AddTimer(2000, std::bind(&WorkerNode::RequireJob, this), true); /* busy不要请求任务 */
