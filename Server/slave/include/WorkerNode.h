@@ -6,12 +6,12 @@
 class WorkerNode
 {
 private:
-    std::string nodeName_;
-    RpcClient* rpcClient_;
-    void* handle_;
-    MapReduceBase* mrObj_;
-    MapReduceBase* (*CreateMapReduceInstance)();
-    void (*DestroyMapReduceInstance)(MapReduceBase*);
+    std::string nodeName_ = "";
+    RpcClient* rpcClient_ = nullptr;
+    void* handle_ = nullptr;
+    MapReduceBase* mrObj_ = nullptr;
+    MapReduceBase* (*CreateMapReduceInstance_)() = nullptr;
+    void (*DestroyMapReduceInstance_)(MapReduceBase*) = nullptr;
 public:
     void SetNodeName(std::string nodeName);
     int LoadCustomizedMapReduce(const std::string& libPath);

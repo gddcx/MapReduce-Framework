@@ -10,15 +10,9 @@
 
 WorkerNode::~WorkerNode()
 {
-    if(rpcClient_ != nullptr) delete rpcClient_;
-    if(mrObj_)
-    {
-        DestroyMapReduceInstance(mrObj_);
-    }
-    if(handle_)
-    {
-        dlclose(handle_);
-    }
+    if(rpcClient_) delete rpcClient_;
+    if(mrObj_) DestroyMapReduceInstance_(mrObj_);
+    if(handle_) dlclose(handle_);
 }
 
 void WorkerNode::SetNodeName(std::string nodeName)
@@ -34,19 +28,21 @@ int WorkerNode::LoadCustomizedMapReduce(const std::string& libPath)
         std::cout << "fail to load dll" << std::endl;
         return -1;
     }
-    CreateMapReduceInstance = (MapReduceBase* (*)()) dlsym(handle_, "CreateMapReduceInstance");
-    if(!CreateMapReduceInstance)
+    CreateMapReduceInstance_ = (MapReduceBase* (*)()) dlsym(handle_, "CreateMapReduceInstance");
+    if(!CreateMapReduceInstance_)
     {
         std::cout << "fail to find function:CreateMapReduceInstance" << std::endl;
         return -1;
     }
-    DestroyMapReduceInstance = (void (*)(MapReduceBase*)) dlsym(handle_, "DestroyMapReduceInstance");
-    if(!DestroyMapReduceInstance)
+    DestroyMapReduceInstance_ = (void (*)(MapReduceBase*)) dlsym(handle_, "DestroyMapReduceInstance");
+    if(!DestroyMapReduceInstance_)
     {
         std::cout << "fail to find function:DestroyMapReduceInstance" << std::endl;
         return -1;
     }
-    mrObj_ = CreateMapReduceInstance();
+    mrObj_ = CreateMapReduceInstance_();
+
+    return 0;
 }
 
 void WorkerNode::CreateRpcClient(std::string& target)
@@ -185,4 +181,5 @@ void WorkerNode::StartWorkerNode(std::string libPath)
         timer.WaitExpired();
         timer.RunCallback();
     }
+    
 }
