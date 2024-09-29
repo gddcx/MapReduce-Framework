@@ -49,11 +49,11 @@ class JobRpc final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::masterSlaveRPC::MapDataList>> PrepareAsyncFetchDataFromMap(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::masterSlaveRPC::MapDataList>>(PrepareAsyncFetchDataFromMapRaw(context, request, cq));
     }
-    virtual ::grpc::Status ReportJobStatus(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::google::protobuf::Empty* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>> AsyncReportJobStatus(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) {
+    virtual ::grpc::Status ReportJobStatus(::grpc::ClientContext* context, const ::masterSlaveRPC::JobMessage& request, ::google::protobuf::Empty* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>> AsyncReportJobStatus(::grpc::ClientContext* context, const ::masterSlaveRPC::JobMessage& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>>(AsyncReportJobStatusRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>> PrepareAsyncReportJobStatus(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) {
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>> PrepareAsyncReportJobStatus(::grpc::ClientContext* context, const ::masterSlaveRPC::JobMessage& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>>(PrepareAsyncReportJobStatusRaw(context, request, cq));
     }
     virtual ::grpc::Status ReportEvent(::grpc::ClientContext* context, const ::masterSlaveRPC::EventMessage& request, ::google::protobuf::Empty* response) = 0;
@@ -63,6 +63,13 @@ class JobRpc final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>> PrepareAsyncReportEvent(::grpc::ClientContext* context, const ::masterSlaveRPC::EventMessage& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>>(PrepareAsyncReportEventRaw(context, request, cq));
     }
+    virtual ::grpc::Status HeartBeat(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::google::protobuf::Empty* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>> AsyncHeartBeat(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>>(AsyncHeartBeatRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>> PrepareAsyncHeartBeat(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>>(PrepareAsyncHeartBeatRaw(context, request, cq));
+    }
     class async_interface {
      public:
       virtual ~async_interface() {}
@@ -70,10 +77,12 @@ class JobRpc final {
       virtual void RequireJob(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage* request, ::masterSlaveRPC::JobMessage* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void FetchDataFromMap(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage* request, ::masterSlaveRPC::MapDataList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void FetchDataFromMap(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage* request, ::masterSlaveRPC::MapDataList* response, ::grpc::ClientUnaryReactor* reactor) = 0;
-      virtual void ReportJobStatus(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void ReportJobStatus(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void ReportJobStatus(::grpc::ClientContext* context, const ::masterSlaveRPC::JobMessage* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ReportJobStatus(::grpc::ClientContext* context, const ::masterSlaveRPC::JobMessage* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void ReportEvent(::grpc::ClientContext* context, const ::masterSlaveRPC::EventMessage* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ReportEvent(::grpc::ClientContext* context, const ::masterSlaveRPC::EventMessage* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void HeartBeat(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void HeartBeat(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) = 0;
     };
     typedef class async_interface experimental_async_interface;
     virtual class async_interface* async() { return nullptr; }
@@ -83,10 +92,12 @@ class JobRpc final {
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::masterSlaveRPC::JobMessage>* PrepareAsyncRequireJobRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::masterSlaveRPC::MapDataList>* AsyncFetchDataFromMapRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::masterSlaveRPC::MapDataList>* PrepareAsyncFetchDataFromMapRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>* AsyncReportJobStatusRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>* PrepareAsyncReportJobStatusRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>* AsyncReportJobStatusRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::JobMessage& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>* PrepareAsyncReportJobStatusRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::JobMessage& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>* AsyncReportEventRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::EventMessage& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>* PrepareAsyncReportEventRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::EventMessage& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>* AsyncHeartBeatRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>* PrepareAsyncHeartBeatRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
@@ -105,11 +116,11 @@ class JobRpc final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::masterSlaveRPC::MapDataList>> PrepareAsyncFetchDataFromMap(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::masterSlaveRPC::MapDataList>>(PrepareAsyncFetchDataFromMapRaw(context, request, cq));
     }
-    ::grpc::Status ReportJobStatus(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::google::protobuf::Empty* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>> AsyncReportJobStatus(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) {
+    ::grpc::Status ReportJobStatus(::grpc::ClientContext* context, const ::masterSlaveRPC::JobMessage& request, ::google::protobuf::Empty* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>> AsyncReportJobStatus(::grpc::ClientContext* context, const ::masterSlaveRPC::JobMessage& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>>(AsyncReportJobStatusRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>> PrepareAsyncReportJobStatus(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) {
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>> PrepareAsyncReportJobStatus(::grpc::ClientContext* context, const ::masterSlaveRPC::JobMessage& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>>(PrepareAsyncReportJobStatusRaw(context, request, cq));
     }
     ::grpc::Status ReportEvent(::grpc::ClientContext* context, const ::masterSlaveRPC::EventMessage& request, ::google::protobuf::Empty* response) override;
@@ -119,6 +130,13 @@ class JobRpc final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>> PrepareAsyncReportEvent(::grpc::ClientContext* context, const ::masterSlaveRPC::EventMessage& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>>(PrepareAsyncReportEventRaw(context, request, cq));
     }
+    ::grpc::Status HeartBeat(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::google::protobuf::Empty* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>> AsyncHeartBeat(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>>(AsyncHeartBeatRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>> PrepareAsyncHeartBeat(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>>(PrepareAsyncHeartBeatRaw(context, request, cq));
+    }
     class async final :
       public StubInterface::async_interface {
      public:
@@ -126,10 +144,12 @@ class JobRpc final {
       void RequireJob(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage* request, ::masterSlaveRPC::JobMessage* response, ::grpc::ClientUnaryReactor* reactor) override;
       void FetchDataFromMap(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage* request, ::masterSlaveRPC::MapDataList* response, std::function<void(::grpc::Status)>) override;
       void FetchDataFromMap(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage* request, ::masterSlaveRPC::MapDataList* response, ::grpc::ClientUnaryReactor* reactor) override;
-      void ReportJobStatus(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)>) override;
-      void ReportJobStatus(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void ReportJobStatus(::grpc::ClientContext* context, const ::masterSlaveRPC::JobMessage* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)>) override;
+      void ReportJobStatus(::grpc::ClientContext* context, const ::masterSlaveRPC::JobMessage* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) override;
       void ReportEvent(::grpc::ClientContext* context, const ::masterSlaveRPC::EventMessage* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)>) override;
       void ReportEvent(::grpc::ClientContext* context, const ::masterSlaveRPC::EventMessage* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void HeartBeat(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)>) override;
+      void HeartBeat(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) override;
      private:
       friend class Stub;
       explicit async(Stub* stub): stub_(stub) { }
@@ -145,14 +165,17 @@ class JobRpc final {
     ::grpc::ClientAsyncResponseReader< ::masterSlaveRPC::JobMessage>* PrepareAsyncRequireJobRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::masterSlaveRPC::MapDataList>* AsyncFetchDataFromMapRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::masterSlaveRPC::MapDataList>* PrepareAsyncFetchDataFromMapRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* AsyncReportJobStatusRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* PrepareAsyncReportJobStatusRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* AsyncReportJobStatusRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::JobMessage& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* PrepareAsyncReportJobStatusRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::JobMessage& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* AsyncReportEventRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::EventMessage& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* PrepareAsyncReportEventRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::EventMessage& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* AsyncHeartBeatRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* PrepareAsyncHeartBeatRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_RequireJob_;
     const ::grpc::internal::RpcMethod rpcmethod_FetchDataFromMap_;
     const ::grpc::internal::RpcMethod rpcmethod_ReportJobStatus_;
     const ::grpc::internal::RpcMethod rpcmethod_ReportEvent_;
+    const ::grpc::internal::RpcMethod rpcmethod_HeartBeat_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -162,8 +185,9 @@ class JobRpc final {
     virtual ~Service();
     virtual ::grpc::Status RequireJob(::grpc::ServerContext* context, const ::masterSlaveRPC::NodeMessage* request, ::masterSlaveRPC::JobMessage* response);
     virtual ::grpc::Status FetchDataFromMap(::grpc::ServerContext* context, const ::masterSlaveRPC::NodeMessage* request, ::masterSlaveRPC::MapDataList* response);
-    virtual ::grpc::Status ReportJobStatus(::grpc::ServerContext* context, const ::masterSlaveRPC::NodeMessage* request, ::google::protobuf::Empty* response);
+    virtual ::grpc::Status ReportJobStatus(::grpc::ServerContext* context, const ::masterSlaveRPC::JobMessage* request, ::google::protobuf::Empty* response);
     virtual ::grpc::Status ReportEvent(::grpc::ServerContext* context, const ::masterSlaveRPC::EventMessage* request, ::google::protobuf::Empty* response);
+    virtual ::grpc::Status HeartBeat(::grpc::ServerContext* context, const ::masterSlaveRPC::NodeMessage* request, ::google::protobuf::Empty* response);
   };
   template <class BaseClass>
   class WithAsyncMethod_RequireJob : public BaseClass {
@@ -217,11 +241,11 @@ class JobRpc final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ReportJobStatus(::grpc::ServerContext* /*context*/, const ::masterSlaveRPC::NodeMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+    ::grpc::Status ReportJobStatus(::grpc::ServerContext* /*context*/, const ::masterSlaveRPC::JobMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestReportJobStatus(::grpc::ServerContext* context, ::masterSlaveRPC::NodeMessage* request, ::grpc::ServerAsyncResponseWriter< ::google::protobuf::Empty>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestReportJobStatus(::grpc::ServerContext* context, ::masterSlaveRPC::JobMessage* request, ::grpc::ServerAsyncResponseWriter< ::google::protobuf::Empty>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
@@ -245,7 +269,27 @@ class JobRpc final {
       ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_RequireJob<WithAsyncMethod_FetchDataFromMap<WithAsyncMethod_ReportJobStatus<WithAsyncMethod_ReportEvent<Service > > > > AsyncService;
+  template <class BaseClass>
+  class WithAsyncMethod_HeartBeat : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_HeartBeat() {
+      ::grpc::Service::MarkMethodAsync(4);
+    }
+    ~WithAsyncMethod_HeartBeat() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status HeartBeat(::grpc::ServerContext* /*context*/, const ::masterSlaveRPC::NodeMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestHeartBeat(::grpc::ServerContext* context, ::masterSlaveRPC::NodeMessage* request, ::grpc::ServerAsyncResponseWriter< ::google::protobuf::Empty>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  typedef WithAsyncMethod_RequireJob<WithAsyncMethod_FetchDataFromMap<WithAsyncMethod_ReportJobStatus<WithAsyncMethod_ReportEvent<WithAsyncMethod_HeartBeat<Service > > > > > AsyncService;
   template <class BaseClass>
   class WithCallbackMethod_RequireJob : public BaseClass {
    private:
@@ -307,25 +351,25 @@ class JobRpc final {
    public:
     WithCallbackMethod_ReportJobStatus() {
       ::grpc::Service::MarkMethodCallback(2,
-          new ::grpc::internal::CallbackUnaryHandler< ::masterSlaveRPC::NodeMessage, ::google::protobuf::Empty>(
+          new ::grpc::internal::CallbackUnaryHandler< ::masterSlaveRPC::JobMessage, ::google::protobuf::Empty>(
             [this](
-                   ::grpc::CallbackServerContext* context, const ::masterSlaveRPC::NodeMessage* request, ::google::protobuf::Empty* response) { return this->ReportJobStatus(context, request, response); }));}
+                   ::grpc::CallbackServerContext* context, const ::masterSlaveRPC::JobMessage* request, ::google::protobuf::Empty* response) { return this->ReportJobStatus(context, request, response); }));}
     void SetMessageAllocatorFor_ReportJobStatus(
-        ::grpc::MessageAllocator< ::masterSlaveRPC::NodeMessage, ::google::protobuf::Empty>* allocator) {
+        ::grpc::MessageAllocator< ::masterSlaveRPC::JobMessage, ::google::protobuf::Empty>* allocator) {
       ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(2);
-      static_cast<::grpc::internal::CallbackUnaryHandler< ::masterSlaveRPC::NodeMessage, ::google::protobuf::Empty>*>(handler)
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::masterSlaveRPC::JobMessage, ::google::protobuf::Empty>*>(handler)
               ->SetMessageAllocator(allocator);
     }
     ~WithCallbackMethod_ReportJobStatus() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ReportJobStatus(::grpc::ServerContext* /*context*/, const ::masterSlaveRPC::NodeMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+    ::grpc::Status ReportJobStatus(::grpc::ServerContext* /*context*/, const ::masterSlaveRPC::JobMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     virtual ::grpc::ServerUnaryReactor* ReportJobStatus(
-      ::grpc::CallbackServerContext* /*context*/, const ::masterSlaveRPC::NodeMessage* /*request*/, ::google::protobuf::Empty* /*response*/)  { return nullptr; }
+      ::grpc::CallbackServerContext* /*context*/, const ::masterSlaveRPC::JobMessage* /*request*/, ::google::protobuf::Empty* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
   class WithCallbackMethod_ReportEvent : public BaseClass {
@@ -354,7 +398,34 @@ class JobRpc final {
     virtual ::grpc::ServerUnaryReactor* ReportEvent(
       ::grpc::CallbackServerContext* /*context*/, const ::masterSlaveRPC::EventMessage* /*request*/, ::google::protobuf::Empty* /*response*/)  { return nullptr; }
   };
-  typedef WithCallbackMethod_RequireJob<WithCallbackMethod_FetchDataFromMap<WithCallbackMethod_ReportJobStatus<WithCallbackMethod_ReportEvent<Service > > > > CallbackService;
+  template <class BaseClass>
+  class WithCallbackMethod_HeartBeat : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_HeartBeat() {
+      ::grpc::Service::MarkMethodCallback(4,
+          new ::grpc::internal::CallbackUnaryHandler< ::masterSlaveRPC::NodeMessage, ::google::protobuf::Empty>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::masterSlaveRPC::NodeMessage* request, ::google::protobuf::Empty* response) { return this->HeartBeat(context, request, response); }));}
+    void SetMessageAllocatorFor_HeartBeat(
+        ::grpc::MessageAllocator< ::masterSlaveRPC::NodeMessage, ::google::protobuf::Empty>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(4);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::masterSlaveRPC::NodeMessage, ::google::protobuf::Empty>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_HeartBeat() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status HeartBeat(::grpc::ServerContext* /*context*/, const ::masterSlaveRPC::NodeMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* HeartBeat(
+      ::grpc::CallbackServerContext* /*context*/, const ::masterSlaveRPC::NodeMessage* /*request*/, ::google::protobuf::Empty* /*response*/)  { return nullptr; }
+  };
+  typedef WithCallbackMethod_RequireJob<WithCallbackMethod_FetchDataFromMap<WithCallbackMethod_ReportJobStatus<WithCallbackMethod_ReportEvent<WithCallbackMethod_HeartBeat<Service > > > > > CallbackService;
   typedef CallbackService ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_RequireJob : public BaseClass {
@@ -402,7 +473,7 @@ class JobRpc final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ReportJobStatus(::grpc::ServerContext* /*context*/, const ::masterSlaveRPC::NodeMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+    ::grpc::Status ReportJobStatus(::grpc::ServerContext* /*context*/, const ::masterSlaveRPC::JobMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -420,6 +491,23 @@ class JobRpc final {
     }
     // disable synchronous version of this method
     ::grpc::Status ReportEvent(::grpc::ServerContext* /*context*/, const ::masterSlaveRPC::EventMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_HeartBeat : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_HeartBeat() {
+      ::grpc::Service::MarkMethodGeneric(4);
+    }
+    ~WithGenericMethod_HeartBeat() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status HeartBeat(::grpc::ServerContext* /*context*/, const ::masterSlaveRPC::NodeMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -476,7 +564,7 @@ class JobRpc final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ReportJobStatus(::grpc::ServerContext* /*context*/, const ::masterSlaveRPC::NodeMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+    ::grpc::Status ReportJobStatus(::grpc::ServerContext* /*context*/, const ::masterSlaveRPC::JobMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -502,6 +590,26 @@ class JobRpc final {
     }
     void RequestReportEvent(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_HeartBeat : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_HeartBeat() {
+      ::grpc::Service::MarkMethodRaw(4);
+    }
+    ~WithRawMethod_HeartBeat() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status HeartBeat(::grpc::ServerContext* /*context*/, const ::masterSlaveRPC::NodeMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestHeartBeat(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -563,7 +671,7 @@ class JobRpc final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ReportJobStatus(::grpc::ServerContext* /*context*/, const ::masterSlaveRPC::NodeMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+    ::grpc::Status ReportJobStatus(::grpc::ServerContext* /*context*/, const ::masterSlaveRPC::JobMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -590,6 +698,28 @@ class JobRpc final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     virtual ::grpc::ServerUnaryReactor* ReportEvent(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_HeartBeat : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_HeartBeat() {
+      ::grpc::Service::MarkMethodRawCallback(4,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->HeartBeat(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_HeartBeat() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status HeartBeat(::grpc::ServerContext* /*context*/, const ::masterSlaveRPC::NodeMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* HeartBeat(
       ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
@@ -654,10 +784,10 @@ class JobRpc final {
     WithStreamedUnaryMethod_ReportJobStatus() {
       ::grpc::Service::MarkMethodStreamed(2,
         new ::grpc::internal::StreamedUnaryHandler<
-          ::masterSlaveRPC::NodeMessage, ::google::protobuf::Empty>(
+          ::masterSlaveRPC::JobMessage, ::google::protobuf::Empty>(
             [this](::grpc::ServerContext* context,
                    ::grpc::ServerUnaryStreamer<
-                     ::masterSlaveRPC::NodeMessage, ::google::protobuf::Empty>* streamer) {
+                     ::masterSlaveRPC::JobMessage, ::google::protobuf::Empty>* streamer) {
                        return this->StreamedReportJobStatus(context,
                          streamer);
                   }));
@@ -666,12 +796,12 @@ class JobRpc final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status ReportJobStatus(::grpc::ServerContext* /*context*/, const ::masterSlaveRPC::NodeMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+    ::grpc::Status ReportJobStatus(::grpc::ServerContext* /*context*/, const ::masterSlaveRPC::JobMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedReportJobStatus(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::masterSlaveRPC::NodeMessage,::google::protobuf::Empty>* server_unary_streamer) = 0;
+    virtual ::grpc::Status StreamedReportJobStatus(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::masterSlaveRPC::JobMessage,::google::protobuf::Empty>* server_unary_streamer) = 0;
   };
   template <class BaseClass>
   class WithStreamedUnaryMethod_ReportEvent : public BaseClass {
@@ -700,9 +830,36 @@ class JobRpc final {
     // replace default version of method with streamed unary
     virtual ::grpc::Status StreamedReportEvent(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::masterSlaveRPC::EventMessage,::google::protobuf::Empty>* server_unary_streamer) = 0;
   };
-  typedef WithStreamedUnaryMethod_RequireJob<WithStreamedUnaryMethod_FetchDataFromMap<WithStreamedUnaryMethod_ReportJobStatus<WithStreamedUnaryMethod_ReportEvent<Service > > > > StreamedUnaryService;
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_HeartBeat : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithStreamedUnaryMethod_HeartBeat() {
+      ::grpc::Service::MarkMethodStreamed(4,
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::masterSlaveRPC::NodeMessage, ::google::protobuf::Empty>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::masterSlaveRPC::NodeMessage, ::google::protobuf::Empty>* streamer) {
+                       return this->StreamedHeartBeat(context,
+                         streamer);
+                  }));
+    }
+    ~WithStreamedUnaryMethod_HeartBeat() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status HeartBeat(::grpc::ServerContext* /*context*/, const ::masterSlaveRPC::NodeMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedHeartBeat(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::masterSlaveRPC::NodeMessage,::google::protobuf::Empty>* server_unary_streamer) = 0;
+  };
+  typedef WithStreamedUnaryMethod_RequireJob<WithStreamedUnaryMethod_FetchDataFromMap<WithStreamedUnaryMethod_ReportJobStatus<WithStreamedUnaryMethod_ReportEvent<WithStreamedUnaryMethod_HeartBeat<Service > > > > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_RequireJob<WithStreamedUnaryMethod_FetchDataFromMap<WithStreamedUnaryMethod_ReportJobStatus<WithStreamedUnaryMethod_ReportEvent<Service > > > > StreamedService;
+  typedef WithStreamedUnaryMethod_RequireJob<WithStreamedUnaryMethod_FetchDataFromMap<WithStreamedUnaryMethod_ReportJobStatus<WithStreamedUnaryMethod_ReportEvent<WithStreamedUnaryMethod_HeartBeat<Service > > > > > StreamedService;
 };
 
 }  // namespace masterSlaveRPC

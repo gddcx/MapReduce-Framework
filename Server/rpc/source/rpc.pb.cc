@@ -65,16 +65,49 @@ struct MapDataListDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 MapDataListDefaultTypeInternal _MapDataList_default_instance_;
 
+inline constexpr Id::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : taskid_{0u},
+        jobid_{0u},
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR Id::Id(::_pbi::ConstantInitialized)
+    : _impl_(::_pbi::ConstantInitialized()) {}
+struct IdDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR IdDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~IdDefaultTypeInternal() {}
+  union {
+    Id _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 IdDefaultTypeInternal _Id_default_instance_;
+      template <typename>
+PROTOBUF_CONSTEXPR EventMessage::EventMessage(::_pbi::ConstantInitialized) {}
+struct EventMessageDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR EventMessageDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~EventMessageDefaultTypeInternal() {}
+  union {
+    EventMessage _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 EventMessageDefaultTypeInternal _EventMessage_default_instance_;
+
 inline constexpr JobMessage::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
-      : key_(
+      : _cached_size_{0},
+        key_(
             &::google::protobuf::internal::fixed_address_empty_string,
             ::_pbi::ConstantInitialized()),
         value_(
             &::google::protobuf::internal::fixed_address_empty_string,
             ::_pbi::ConstantInitialized()),
-        type_{static_cast< ::masterSlaveRPC::JobMessage_TaskType >(0)},
-        _cached_size_{0} {}
+        id_{nullptr},
+        type_{static_cast< ::masterSlaveRPC::TaskType >(0)} {}
 
 template <typename>
 PROTOBUF_CONSTEXPR JobMessage::JobMessage(::_pbi::ConstantInitialized)
@@ -89,18 +122,6 @@ struct JobMessageDefaultTypeInternal {
 
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 JobMessageDefaultTypeInternal _JobMessage_default_instance_;
-      template <typename>
-PROTOBUF_CONSTEXPR EventMessage::EventMessage(::_pbi::ConstantInitialized) {}
-struct EventMessageDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR EventMessageDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
-  ~EventMessageDefaultTypeInternal() {}
-  union {
-    EventMessage _instance;
-  };
-};
-
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
-    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 EventMessageDefaultTypeInternal _EventMessage_default_instance_;
 }  // namespace masterSlaveRPC
 static const ::_pb::EnumDescriptor* file_level_enum_descriptors_rpc_2eproto[1];
 static constexpr const ::_pb::ServiceDescriptor**
@@ -118,6 +139,16 @@ const ::uint32_t
         ~0u,  // no sizeof(Split)
         PROTOBUF_FIELD_OFFSET(::masterSlaveRPC::NodeMessage, _impl_.nodename_),
         ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::masterSlaveRPC::Id, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::masterSlaveRPC::Id, _impl_.taskid_),
+        PROTOBUF_FIELD_OFFSET(::masterSlaveRPC::Id, _impl_.jobid_),
+        PROTOBUF_FIELD_OFFSET(::masterSlaveRPC::JobMessage, _impl_._has_bits_),
         PROTOBUF_FIELD_OFFSET(::masterSlaveRPC::JobMessage, _internal_metadata_),
         ~0u,  // no _extensions_
         ~0u,  // no _oneof_case_
@@ -128,6 +159,11 @@ const ::uint32_t
         PROTOBUF_FIELD_OFFSET(::masterSlaveRPC::JobMessage, _impl_.type_),
         PROTOBUF_FIELD_OFFSET(::masterSlaveRPC::JobMessage, _impl_.key_),
         PROTOBUF_FIELD_OFFSET(::masterSlaveRPC::JobMessage, _impl_.value_),
+        PROTOBUF_FIELD_OFFSET(::masterSlaveRPC::JobMessage, _impl_.id_),
+        ~0u,
+        ~0u,
+        ~0u,
+        0,
         ~0u,  // no _has_bits_
         PROTOBUF_FIELD_OFFSET(::masterSlaveRPC::MapDataList, _internal_metadata_),
         ~0u,  // no _extensions_
@@ -150,12 +186,14 @@ const ::uint32_t
 static const ::_pbi::MigrationSchema
     schemas[] ABSL_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
         {0, -1, -1, sizeof(::masterSlaveRPC::NodeMessage)},
-        {9, -1, -1, sizeof(::masterSlaveRPC::JobMessage)},
-        {20, -1, -1, sizeof(::masterSlaveRPC::MapDataList)},
-        {29, -1, -1, sizeof(::masterSlaveRPC::EventMessage)},
+        {9, -1, -1, sizeof(::masterSlaveRPC::Id)},
+        {19, 31, -1, sizeof(::masterSlaveRPC::JobMessage)},
+        {35, -1, -1, sizeof(::masterSlaveRPC::MapDataList)},
+        {44, -1, -1, sizeof(::masterSlaveRPC::EventMessage)},
 };
 static const ::_pb::Message* const file_default_instances[] = {
     &::masterSlaveRPC::_NodeMessage_default_instance_._instance,
+    &::masterSlaveRPC::_Id_default_instance_._instance,
     &::masterSlaveRPC::_JobMessage_default_instance_._instance,
     &::masterSlaveRPC::_MapDataList_default_instance_._instance,
     &::masterSlaveRPC::_EventMessage_default_instance_._instance,
@@ -164,19 +202,22 @@ const char descriptor_table_protodef_rpc_2eproto[] ABSL_ATTRIBUTE_SECTION_VARIAB
     protodesc_cold) = {
     "\n\trpc.proto\022\016masterSlaveRPC\032\033google/prot"
     "obuf/empty.proto\"\037\n\013NodeMessage\022\020\n\010nodeN"
-    "ame\030\001 \001(\t\"\207\001\n\nJobMessage\0221\n\004type\030\001 \001(\0162#"
-    ".masterSlaveRPC.JobMessage.TaskType\022\013\n\003k"
-    "ey\030\002 \001(\t\022\r\n\005value\030\003 \001(\t\"*\n\010TaskType\022\007\n\003m"
-    "ap\020\000\022\n\n\006reduce\020\001\022\t\n\005fetch\020\002\"\037\n\013MapDataLi"
-    "st\022\020\n\010filename\030\001 \003(\t\"\016\n\014EventMessage2\262\002\n"
-    "\006JobRpc\022G\n\nRequireJob\022\033.masterSlaveRPC.N"
-    "odeMessage\032\032.masterSlaveRPC.JobMessage\"\000"
-    "\022N\n\020FetchDataFromMap\022\033.masterSlaveRPC.No"
-    "deMessage\032\033.masterSlaveRPC.MapDataList\"\000"
-    "\022H\n\017ReportJobStatus\022\033.masterSlaveRPC.Nod"
-    "eMessage\032\026.google.protobuf.Empty\"\000\022E\n\013Re"
-    "portEvent\022\034.masterSlaveRPC.EventMessage\032"
-    "\026.google.protobuf.Empty\"\000b\006proto3"
+    "ame\030\001 \001(\t\"#\n\002Id\022\016\n\006taskId\030\001 \001(\r\022\r\n\005jobId"
+    "\030\002 \001(\r\"p\n\nJobMessage\022&\n\004type\030\001 \001(\0162\030.mas"
+    "terSlaveRPC.TaskType\022\013\n\003key\030\002 \001(\t\022\r\n\005val"
+    "ue\030\003 \001(\t\022\036\n\002id\030\004 \001(\0132\022.masterSlaveRPC.Id"
+    "\"\037\n\013MapDataList\022\020\n\010filename\030\001 \003(\t\"\016\n\014Eve"
+    "ntMessage**\n\010TaskType\022\007\n\003map\020\000\022\n\n\006reduce"
+    "\020\001\022\t\n\005fetch\020\0022\365\002\n\006JobRpc\022G\n\nRequireJob\022\033"
+    ".masterSlaveRPC.NodeMessage\032\032.masterSlav"
+    "eRPC.JobMessage\"\000\022N\n\020FetchDataFromMap\022\033."
+    "masterSlaveRPC.NodeMessage\032\033.masterSlave"
+    "RPC.MapDataList\"\000\022G\n\017ReportJobStatus\022\032.m"
+    "asterSlaveRPC.JobMessage\032\026.google.protob"
+    "uf.Empty\"\000\022E\n\013ReportEvent\022\034.masterSlaveR"
+    "PC.EventMessage\032\026.google.protobuf.Empty\""
+    "\000\022B\n\tHeartBeat\022\033.masterSlaveRPC.NodeMess"
+    "age\032\026.google.protobuf.Empty\"\000b\006proto3"
 };
 static const ::_pbi::DescriptorTable* const descriptor_table_rpc_2eproto_deps[1] =
     {
@@ -186,13 +227,13 @@ static ::absl::once_flag descriptor_table_rpc_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_rpc_2eproto = {
     false,
     false,
-    593,
+    717,
     descriptor_table_protodef_rpc_2eproto,
     "rpc.proto",
     &descriptor_table_rpc_2eproto_once,
     descriptor_table_rpc_2eproto_deps,
     1,
-    4,
+    5,
     schemas,
     file_default_instances,
     TableStruct_rpc_2eproto::offsets,
@@ -200,27 +241,15 @@ PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_rpc_2eproto = 
     file_level_service_descriptors_rpc_2eproto,
 };
 namespace masterSlaveRPC {
-const ::google::protobuf::EnumDescriptor* JobMessage_TaskType_descriptor() {
+const ::google::protobuf::EnumDescriptor* TaskType_descriptor() {
   ::google::protobuf::internal::AssignDescriptors(&descriptor_table_rpc_2eproto);
   return file_level_enum_descriptors_rpc_2eproto[0];
 }
-PROTOBUF_CONSTINIT const uint32_t JobMessage_TaskType_internal_data_[] = {
+PROTOBUF_CONSTINIT const uint32_t TaskType_internal_data_[] = {
     196608u, 0u, };
-bool JobMessage_TaskType_IsValid(int value) {
+bool TaskType_IsValid(int value) {
   return 0 <= value && value <= 2;
 }
-#if (__cplusplus < 201703) && \
-  (!defined(_MSC_VER) || (_MSC_VER >= 1900 && _MSC_VER < 1912))
-
-constexpr JobMessage_TaskType JobMessage::map;
-constexpr JobMessage_TaskType JobMessage::reduce;
-constexpr JobMessage_TaskType JobMessage::fetch;
-constexpr JobMessage_TaskType JobMessage::TaskType_MIN;
-constexpr JobMessage_TaskType JobMessage::TaskType_MAX;
-constexpr int JobMessage::TaskType_ARRAYSIZE;
-
-#endif  // (__cplusplus < 201703) &&
-        // (!defined(_MSC_VER) || (_MSC_VER >= 1900 && _MSC_VER < 1912))
 // ===================================================================
 
 class NodeMessage::_Internal {
@@ -415,8 +444,219 @@ void NodeMessage::InternalSwap(NodeMessage* PROTOBUF_RESTRICT other) {
 }
 // ===================================================================
 
+class Id::_Internal {
+ public:
+};
+
+Id::Id(::google::protobuf::Arena* arena)
+    : ::google::protobuf::Message(arena) {
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:masterSlaveRPC.Id)
+}
+Id::Id(
+    ::google::protobuf::Arena* arena, const Id& from)
+    : Id(arena) {
+  MergeFrom(from);
+}
+inline PROTOBUF_NDEBUG_INLINE Id::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
+
+inline void Id::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, taskid_),
+           0,
+           offsetof(Impl_, jobid_) -
+               offsetof(Impl_, taskid_) +
+               sizeof(Impl_::jobid_));
+}
+Id::~Id() {
+  // @@protoc_insertion_point(destructor:masterSlaveRPC.Id)
+  _internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  SharedDtor();
+}
+inline void Id::SharedDtor() {
+  ABSL_DCHECK(GetArena() == nullptr);
+  _impl_.~Impl_();
+}
+
+const ::google::protobuf::MessageLite::ClassData*
+Id::GetClassData() const {
+  PROTOBUF_CONSTINIT static const ::google::protobuf::MessageLite::
+      ClassDataFull _data_ = {
+          {
+              &_table_.header,
+              nullptr,  // OnDemandRegisterArenaDtor
+              nullptr,  // IsInitialized
+              PROTOBUF_FIELD_OFFSET(Id, _impl_._cached_size_),
+              false,
+          },
+          &Id::MergeImpl,
+          &Id::kDescriptorMethods,
+          &descriptor_table_rpc_2eproto,
+          nullptr,  // tracker
+      };
+  ::google::protobuf::internal::PrefetchToLocalCache(&_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_data_.tc_table);
+  return _data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<1, 2, 0, 0, 2> Id::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    2, 8,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967292,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    2,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    &_Id_default_instance_._instance,
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::masterSlaveRPC::Id>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // uint32 jobId = 2;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(Id, _impl_.jobid_), 63>(),
+     {16, 63, 0, PROTOBUF_FIELD_OFFSET(Id, _impl_.jobid_)}},
+    // uint32 taskId = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(Id, _impl_.taskid_), 63>(),
+     {8, 63, 0, PROTOBUF_FIELD_OFFSET(Id, _impl_.taskid_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // uint32 taskId = 1;
+    {PROTOBUF_FIELD_OFFSET(Id, _impl_.taskid_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt32)},
+    // uint32 jobId = 2;
+    {PROTOBUF_FIELD_OFFSET(Id, _impl_.jobid_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt32)},
+  }},
+  // no aux_entries
+  {{
+  }},
+};
+
+PROTOBUF_NOINLINE void Id::Clear() {
+// @@protoc_insertion_point(message_clear_start:masterSlaveRPC.Id)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  ::memset(&_impl_.taskid_, 0, static_cast<::size_t>(
+      reinterpret_cast<char*>(&_impl_.jobid_) -
+      reinterpret_cast<char*>(&_impl_.taskid_)) + sizeof(_impl_.jobid_));
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+::uint8_t* Id::_InternalSerialize(
+    ::uint8_t* target,
+    ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:masterSlaveRPC.Id)
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
+
+  // uint32 taskId = 1;
+  if (this->_internal_taskid() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        1, this->_internal_taskid(), target);
+  }
+
+  // uint32 jobId = 2;
+  if (this->_internal_jobid() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        2, this->_internal_jobid(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:masterSlaveRPC.Id)
+  return target;
+}
+
+::size_t Id::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:masterSlaveRPC.Id)
+  ::size_t total_size = 0;
+
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  ::_pbi::Prefetch5LinesFrom7Lines(reinterpret_cast<const void*>(this));
+  // uint32 taskId = 1;
+  if (this->_internal_taskid() != 0) {
+    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+        this->_internal_taskid());
+  }
+
+  // uint32 jobId = 2;
+  if (this->_internal_jobid() != 0) {
+    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+        this->_internal_jobid());
+  }
+
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+}
+
+
+void Id::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<Id*>(&to_msg);
+  auto& from = static_cast<const Id&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:masterSlaveRPC.Id)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from._internal_taskid() != 0) {
+    _this->_impl_.taskid_ = from._impl_.taskid_;
+  }
+  if (from._internal_jobid() != 0) {
+    _this->_impl_.jobid_ = from._impl_.jobid_;
+  }
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void Id::CopyFrom(const Id& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:masterSlaveRPC.Id)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void Id::InternalSwap(Id* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::google::protobuf::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(Id, _impl_.jobid_)
+      + sizeof(Id::_impl_.jobid_)
+      - PROTOBUF_FIELD_OFFSET(Id, _impl_.taskid_)>(
+          reinterpret_cast<char*>(&_impl_.taskid_),
+          reinterpret_cast<char*>(&other->_impl_.taskid_));
+}
+
+::google::protobuf::Metadata Id::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
 class JobMessage::_Internal {
  public:
+  using HasBits =
+      decltype(std::declval<JobMessage>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+      8 * PROTOBUF_FIELD_OFFSET(JobMessage, _impl_._has_bits_);
 };
 
 JobMessage::JobMessage(::google::protobuf::Arena* arena)
@@ -427,9 +667,10 @@ JobMessage::JobMessage(::google::protobuf::Arena* arena)
 inline PROTOBUF_NDEBUG_INLINE JobMessage::Impl_::Impl_(
     ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
     const Impl_& from, const ::masterSlaveRPC::JobMessage& from_msg)
-      : key_(arena, from.key_),
-        value_(arena, from.value_),
-        _cached_size_{0} {}
+      : _has_bits_{from._has_bits_},
+        _cached_size_{0},
+        key_(arena, from.key_),
+        value_(arena, from.value_) {}
 
 JobMessage::JobMessage(
     ::google::protobuf::Arena* arena,
@@ -440,6 +681,10 @@ JobMessage::JobMessage(
   _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
       from._internal_metadata_);
   new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+  ::uint32_t cached_has_bits = _impl_._has_bits_[0];
+  _impl_.id_ = (cached_has_bits & 0x00000001u) ? ::google::protobuf::Message::CopyConstruct<::masterSlaveRPC::Id>(
+                              arena, *from._impl_.id_)
+                        : nullptr;
   _impl_.type_ = from._impl_.type_;
 
   // @@protoc_insertion_point(copy_constructor:masterSlaveRPC.JobMessage)
@@ -447,13 +692,18 @@ JobMessage::JobMessage(
 inline PROTOBUF_NDEBUG_INLINE JobMessage::Impl_::Impl_(
     ::google::protobuf::internal::InternalVisibility visibility,
     ::google::protobuf::Arena* arena)
-      : key_(arena),
-        value_(arena),
-        _cached_size_{0} {}
+      : _cached_size_{0},
+        key_(arena),
+        value_(arena) {}
 
 inline void JobMessage::SharedCtor(::_pb::Arena* arena) {
   new (&_impl_) Impl_(internal_visibility(), arena);
-  _impl_.type_ = {};
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, id_),
+           0,
+           offsetof(Impl_, type_) -
+               offsetof(Impl_, id_) +
+               sizeof(Impl_::type_));
 }
 JobMessage::~JobMessage() {
   // @@protoc_insertion_point(destructor:masterSlaveRPC.JobMessage)
@@ -464,6 +714,7 @@ inline void JobMessage::SharedDtor() {
   ABSL_DCHECK(GetArena() == nullptr);
   _impl_.key_.Destroy();
   _impl_.value_.Destroy();
+  delete _impl_.id_;
   _impl_.~Impl_();
 }
 
@@ -488,17 +739,17 @@ JobMessage::GetClassData() const {
   return _data_.base();
 }
 PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
-const ::_pbi::TcParseTable<2, 3, 0, 42, 2> JobMessage::_table_ = {
+const ::_pbi::TcParseTable<2, 4, 1, 42, 2> JobMessage::_table_ = {
   {
-    0,  // no _has_bits_
+    PROTOBUF_FIELD_OFFSET(JobMessage, _impl_._has_bits_),
     0, // no _extensions_
-    3, 24,  // max_field_number, fast_idx_mask
+    4, 24,  // max_field_number, fast_idx_mask
     offsetof(decltype(_table_), field_lookup_table),
-    4294967288,  // skipmap
+    4294967280,  // skipmap
     offsetof(decltype(_table_), field_entries),
-    3,  // num_field_entries
-    0,  // num_aux_entries
-    offsetof(decltype(_table_), field_names),  // no aux_entries
+    4,  // num_field_entries
+    1,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
     &_JobMessage_default_instance_._instance,
     nullptr,  // post_loop_handler
     ::_pbi::TcParser::GenericFallback,  // fallback
@@ -506,8 +757,10 @@ const ::_pbi::TcParseTable<2, 3, 0, 42, 2> JobMessage::_table_ = {
     ::_pbi::TcParser::GetTable<::masterSlaveRPC::JobMessage>(),  // to_prefetch
     #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
   }, {{
-    {::_pbi::TcParser::MiniParse, {}},
-    // .masterSlaveRPC.JobMessage.TaskType type = 1;
+    // .masterSlaveRPC.Id id = 4;
+    {::_pbi::TcParser::FastMtS1,
+     {34, 0, 0, PROTOBUF_FIELD_OFFSET(JobMessage, _impl_.id_)}},
+    // .masterSlaveRPC.TaskType type = 1;
     {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(JobMessage, _impl_.type_), 63>(),
      {8, 63, 0, PROTOBUF_FIELD_OFFSET(JobMessage, _impl_.type_)}},
     // string key = 2;
@@ -519,18 +772,21 @@ const ::_pbi::TcParseTable<2, 3, 0, 42, 2> JobMessage::_table_ = {
   }}, {{
     65535, 65535
   }}, {{
-    // .masterSlaveRPC.JobMessage.TaskType type = 1;
-    {PROTOBUF_FIELD_OFFSET(JobMessage, _impl_.type_), 0, 0,
+    // .masterSlaveRPC.TaskType type = 1;
+    {PROTOBUF_FIELD_OFFSET(JobMessage, _impl_.type_), -1, 0,
     (0 | ::_fl::kFcSingular | ::_fl::kOpenEnum)},
     // string key = 2;
-    {PROTOBUF_FIELD_OFFSET(JobMessage, _impl_.key_), 0, 0,
+    {PROTOBUF_FIELD_OFFSET(JobMessage, _impl_.key_), -1, 0,
     (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
     // string value = 3;
-    {PROTOBUF_FIELD_OFFSET(JobMessage, _impl_.value_), 0, 0,
+    {PROTOBUF_FIELD_OFFSET(JobMessage, _impl_.value_), -1, 0,
     (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
-  }},
-  // no aux_entries
-  {{
+    // .masterSlaveRPC.Id id = 4;
+    {PROTOBUF_FIELD_OFFSET(JobMessage, _impl_.id_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+  }}, {{
+    {::_pbi::TcParser::GetTable<::masterSlaveRPC::Id>()},
+  }}, {{
     "\31\0\3\5\0\0\0\0"
     "masterSlaveRPC.JobMessage"
     "key"
@@ -547,7 +803,13 @@ PROTOBUF_NOINLINE void JobMessage::Clear() {
 
   _impl_.key_.ClearToEmpty();
   _impl_.value_.ClearToEmpty();
+  cached_has_bits = _impl_._has_bits_[0];
+  if (cached_has_bits & 0x00000001u) {
+    ABSL_DCHECK(_impl_.id_ != nullptr);
+    _impl_.id_->Clear();
+  }
   _impl_.type_ = 0;
+  _impl_._has_bits_.Clear();
   _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
@@ -558,7 +820,7 @@ PROTOBUF_NOINLINE void JobMessage::Clear() {
   ::uint32_t cached_has_bits = 0;
   (void)cached_has_bits;
 
-  // .masterSlaveRPC.JobMessage.TaskType type = 1;
+  // .masterSlaveRPC.TaskType type = 1;
   if (this->_internal_type() != 0) {
     target = stream->EnsureSpace(target);
     target = ::_pbi::WireFormatLite::WriteEnumToArray(
@@ -579,6 +841,13 @@ PROTOBUF_NOINLINE void JobMessage::Clear() {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
         _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "masterSlaveRPC.JobMessage.value");
     target = stream->WriteStringMaybeAliased(3, _s, target);
+  }
+
+  cached_has_bits = _impl_._has_bits_[0];
+  // .masterSlaveRPC.Id id = 4;
+  if (cached_has_bits & 0x00000001u) {
+    target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+        4, *_impl_.id_, _impl_.id_->GetCachedSize(), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -611,7 +880,14 @@ PROTOBUF_NOINLINE void JobMessage::Clear() {
                                     this->_internal_value());
   }
 
-  // .masterSlaveRPC.JobMessage.TaskType type = 1;
+  // .masterSlaveRPC.Id id = 4;
+  cached_has_bits = _impl_._has_bits_[0];
+  if (cached_has_bits & 0x00000001u) {
+    total_size +=
+        1 + ::google::protobuf::internal::WireFormatLite::MessageSize(*_impl_.id_);
+  }
+
+  // .masterSlaveRPC.TaskType type = 1;
   if (this->_internal_type() != 0) {
     total_size += 1 +
                   ::_pbi::WireFormatLite::EnumSize(this->_internal_type());
@@ -624,6 +900,7 @@ PROTOBUF_NOINLINE void JobMessage::Clear() {
 void JobMessage::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
   auto* const _this = static_cast<JobMessage*>(&to_msg);
   auto& from = static_cast<const JobMessage&>(from_msg);
+  ::google::protobuf::Arena* arena = _this->GetArena();
   // @@protoc_insertion_point(class_specific_merge_from_start:masterSlaveRPC.JobMessage)
   ABSL_DCHECK_NE(&from, _this);
   ::uint32_t cached_has_bits = 0;
@@ -635,9 +912,20 @@ void JobMessage::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::goog
   if (!from._internal_value().empty()) {
     _this->_internal_set_value(from._internal_value());
   }
+  cached_has_bits = from._impl_._has_bits_[0];
+  if (cached_has_bits & 0x00000001u) {
+    ABSL_DCHECK(from._impl_.id_ != nullptr);
+    if (_this->_impl_.id_ == nullptr) {
+      _this->_impl_.id_ =
+          ::google::protobuf::Message::CopyConstruct<::masterSlaveRPC::Id>(arena, *from._impl_.id_);
+    } else {
+      _this->_impl_.id_->MergeFrom(*from._impl_.id_);
+    }
+  }
   if (from._internal_type() != 0) {
     _this->_impl_.type_ = from._impl_.type_;
   }
+  _this->_impl_._has_bits_[0] |= cached_has_bits;
   _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
@@ -654,9 +942,15 @@ void JobMessage::InternalSwap(JobMessage* PROTOBUF_RESTRICT other) {
   auto* arena = GetArena();
   ABSL_DCHECK_EQ(arena, other->GetArena());
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.key_, &other->_impl_.key_, arena);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.value_, &other->_impl_.value_, arena);
-  swap(_impl_.type_, other->_impl_.type_);
+  ::google::protobuf::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(JobMessage, _impl_.type_)
+      + sizeof(JobMessage::_impl_.type_)
+      - PROTOBUF_FIELD_OFFSET(JobMessage, _impl_.id_)>(
+          reinterpret_cast<char*>(&_impl_.id_),
+          reinterpret_cast<char*>(&other->_impl_.id_));
 }
 
 ::google::protobuf::Metadata JobMessage::GetMetadata() const {

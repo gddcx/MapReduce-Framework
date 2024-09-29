@@ -26,6 +26,7 @@ static const char* JobRpc_method_names[] = {
   "/masterSlaveRPC.JobRpc/FetchDataFromMap",
   "/masterSlaveRPC.JobRpc/ReportJobStatus",
   "/masterSlaveRPC.JobRpc/ReportEvent",
+  "/masterSlaveRPC.JobRpc/HeartBeat",
 };
 
 std::unique_ptr< JobRpc::Stub> JobRpc::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -39,6 +40,7 @@ JobRpc::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, co
   , rpcmethod_FetchDataFromMap_(JobRpc_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_ReportJobStatus_(JobRpc_method_names[2], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_ReportEvent_(JobRpc_method_names[3], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_HeartBeat_(JobRpc_method_names[4], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status JobRpc::Stub::RequireJob(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::masterSlaveRPC::JobMessage* response) {
@@ -87,23 +89,23 @@ void JobRpc::Stub::async::FetchDataFromMap(::grpc::ClientContext* context, const
   return result;
 }
 
-::grpc::Status JobRpc::Stub::ReportJobStatus(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::google::protobuf::Empty* response) {
-  return ::grpc::internal::BlockingUnaryCall< ::masterSlaveRPC::NodeMessage, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_ReportJobStatus_, context, request, response);
+::grpc::Status JobRpc::Stub::ReportJobStatus(::grpc::ClientContext* context, const ::masterSlaveRPC::JobMessage& request, ::google::protobuf::Empty* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::masterSlaveRPC::JobMessage, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_ReportJobStatus_, context, request, response);
 }
 
-void JobRpc::Stub::async::ReportJobStatus(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)> f) {
-  ::grpc::internal::CallbackUnaryCall< ::masterSlaveRPC::NodeMessage, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_ReportJobStatus_, context, request, response, std::move(f));
+void JobRpc::Stub::async::ReportJobStatus(::grpc::ClientContext* context, const ::masterSlaveRPC::JobMessage* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::masterSlaveRPC::JobMessage, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_ReportJobStatus_, context, request, response, std::move(f));
 }
 
-void JobRpc::Stub::async::ReportJobStatus(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) {
+void JobRpc::Stub::async::ReportJobStatus(::grpc::ClientContext* context, const ::masterSlaveRPC::JobMessage* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) {
   ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_ReportJobStatus_, context, request, response, reactor);
 }
 
-::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* JobRpc::Stub::PrepareAsyncReportJobStatusRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::google::protobuf::Empty, ::masterSlaveRPC::NodeMessage, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_ReportJobStatus_, context, request);
+::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* JobRpc::Stub::PrepareAsyncReportJobStatusRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::JobMessage& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::google::protobuf::Empty, ::masterSlaveRPC::JobMessage, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_ReportJobStatus_, context, request);
 }
 
-::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* JobRpc::Stub::AsyncReportJobStatusRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) {
+::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* JobRpc::Stub::AsyncReportJobStatusRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::JobMessage& request, ::grpc::CompletionQueue* cq) {
   auto* result =
     this->PrepareAsyncReportJobStatusRaw(context, request, cq);
   result->StartCall();
@@ -133,6 +135,29 @@ void JobRpc::Stub::async::ReportEvent(::grpc::ClientContext* context, const ::ma
   return result;
 }
 
+::grpc::Status JobRpc::Stub::HeartBeat(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::google::protobuf::Empty* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::masterSlaveRPC::NodeMessage, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_HeartBeat_, context, request, response);
+}
+
+void JobRpc::Stub::async::HeartBeat(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::masterSlaveRPC::NodeMessage, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_HeartBeat_, context, request, response, std::move(f));
+}
+
+void JobRpc::Stub::async::HeartBeat(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_HeartBeat_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* JobRpc::Stub::PrepareAsyncHeartBeatRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::google::protobuf::Empty, ::masterSlaveRPC::NodeMessage, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_HeartBeat_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* JobRpc::Stub::AsyncHeartBeatRaw(::grpc::ClientContext* context, const ::masterSlaveRPC::NodeMessage& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncHeartBeatRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
 JobRpc::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       JobRpc_method_names[0],
@@ -157,10 +182,10 @@ JobRpc::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       JobRpc_method_names[2],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< JobRpc::Service, ::masterSlaveRPC::NodeMessage, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+      new ::grpc::internal::RpcMethodHandler< JobRpc::Service, ::masterSlaveRPC::JobMessage, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](JobRpc::Service* service,
              ::grpc::ServerContext* ctx,
-             const ::masterSlaveRPC::NodeMessage* req,
+             const ::masterSlaveRPC::JobMessage* req,
              ::google::protobuf::Empty* resp) {
                return service->ReportJobStatus(ctx, req, resp);
              }, this)));
@@ -173,6 +198,16 @@ JobRpc::Service::Service() {
              const ::masterSlaveRPC::EventMessage* req,
              ::google::protobuf::Empty* resp) {
                return service->ReportEvent(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      JobRpc_method_names[4],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< JobRpc::Service, ::masterSlaveRPC::NodeMessage, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](JobRpc::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::masterSlaveRPC::NodeMessage* req,
+             ::google::protobuf::Empty* resp) {
+               return service->HeartBeat(ctx, req, resp);
              }, this)));
 }
 
@@ -193,7 +228,7 @@ JobRpc::Service::~Service() {
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status JobRpc::Service::ReportJobStatus(::grpc::ServerContext* context, const ::masterSlaveRPC::NodeMessage* request, ::google::protobuf::Empty* response) {
+::grpc::Status JobRpc::Service::ReportJobStatus(::grpc::ServerContext* context, const ::masterSlaveRPC::JobMessage* request, ::google::protobuf::Empty* response) {
   (void) context;
   (void) request;
   (void) response;
@@ -201,6 +236,13 @@ JobRpc::Service::~Service() {
 }
 
 ::grpc::Status JobRpc::Service::ReportEvent(::grpc::ServerContext* context, const ::masterSlaveRPC::EventMessage* request, ::google::protobuf::Empty* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status JobRpc::Service::HeartBeat(::grpc::ServerContext* context, const ::masterSlaveRPC::NodeMessage* request, ::google::protobuf::Empty* response) {
   (void) context;
   (void) request;
   (void) response;

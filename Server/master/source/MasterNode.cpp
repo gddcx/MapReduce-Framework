@@ -9,96 +9,50 @@ MasterNode::MasterNode(std::string rpcListen)
 
 MasterNode::~MasterNode()
 {
-    delete rpcServer_;
+    if(rpcServer_) delete rpcServer_;
 }
 
-void MasterNode::SetReduceNodeNum(int num)
-{   
-    std::string key;
-    reduceJobsNum_ = num;
-    for(int idx = 0; idx < num; idx++)
+void MasterNode::AddJob(std::vector<std::string>& keys, std::vector<std::string>& values, int reduceJobNum)
+{
+    jobManager_.JmAddNewTask(keys, values, reduceJobNum);
+}
+
+
+void MasterNode::ChangeJobStatus(int jobType, uint taskId, uint jobId)
+{
+    jobManager_.JmChangeJobStatus(JobType(jobType), taskId, jobId);
+}
+
+bool MasterNode::GetMapJob(std::string nodeName, std::string& key, std::string& value, uint& taskId, uint& jobId)
+{
+    if(jobManager_.JmAllocMapJob(key, value, nodeName, taskId, jobId) == MR_OK)
     {
-        key = INTERMEDIATE_FILE_PREFIX + std::to_string(idx) + INTERMEDIATE_FILE_SUBFIX;
-        reduceJobs_.emplace_back(key, "", JOB_NO_START);
-        key = "";
-    }
-}
-
-int MasterNode::GetReduceNodeNum()
-{
-    return reduceJobsNum_ > 0 ? reduceJobsNum_-- : 0;
-}
-
-void MasterNode::StartMasterNode()
-{
-    rpcServer_->SetChangeWorkStatusCallback(std::bind(&MasterNode::ChangeWorkStatus, this, std::placeholders::_1));
-    rpcServer_->SetGetIntermediateFileCallback(std::bind(&MasterNode::GetIntermediateFile, this, std::placeholders::_1));
-    rpcServer_->SetGetMapJobCallback(std::bind(&MasterNode::GetJob, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-    rpcServer_->SetGetReduceJobNumCallback(std::bind(&MasterNode::GetReduceNodeNum, this));
-    rpcServer_->RunRpcServer();
-}
-
-void MasterNode::AddJob(std::string& key, std::string& value)
-{
-    std::lock_guard<std::mutex> lock(jobMutex_);
-
-    jobs_.emplace_back(key, value, JOB_NO_START);
-    mapJobsNum_ = jobs_.size();
-}
-
-bool MasterNode::GetJob(std::string nodeName, std::string& key, std::string& value) 
-{
-    std::lock_guard<std::mutex> lock(jobMutex_);
-
-    for(auto& workStatus: jobs_)
-    {
-        if(workStatus.status_ == JOB_NO_START)
-        {
-            workStatus.status_ = JOB_RUNNNING;
-            workStatus.workerNodeName_ = nodeName;
-            key = workStatus.key_;
-            value = workStatus.value_;
-            return MR_OK;
-        }
+        nodeManager_.NmMonitorNewNode(0x7f000001, nodeName); // TODO：临时写入地址127.0.0.1
+        return MR_OK;
     }
     return MR_ERROR;
 }
 
-void MasterNode::ChangeWorkStatus(std::string& nodeName)
+bool MasterNode::GetReduceJob(std::string nodeName, std::string& key, std::string& value, uint& taskId, uint& jobId)
 {
-    for(auto& workStatus: jobs_)
+    if(jobManager_.JmAllocReduceJob(key, value, nodeName, taskId, jobId) == MR_OK)
     {
-        if(workStatus.workerNodeName_ == nodeName)
-        {
-            workStatus.status_ = JOB_FINISHED;
-            mapJobsNum_--;
-            break;
-        }
+        nodeManager_.NmMonitorNewNode(0x7f000001, nodeName); // TODO：临时写入地址127.0.0.1
+        return MR_OK;
     }
+    return MR_ERROR;
 }
 
-std::vector<std::string> MasterNode::GetIntermediateFile(std::string nodeName)
+void MasterNode::HeartBeatDetect(std::string& nodeName)
 {
-    std::stringstream url;
-    std::vector<std::string> res;
-    WorkStatus* workStatus;
+    nodeManager_.NmSetNodeStatus(nodeName, ONLINE);
+}
 
-    for(size_t idx = 0; idx < reduceJobs_.size(); idx++)
-    {
-        workStatus = &reduceJobs_[idx];
-        if(workStatus->status_ == JOB_NO_START)
-        {
-            workStatus->status_ = JOB_RUNNNING;
-            workStatus->workerNodeName_ = nodeName;
-            for(const auto& workStatus: jobs_)
-            {
-                url << workStatus.workerNodeName_ << "/" << INTERMEDIATE_FILE_PREFIX << idx << INTERMEDIATE_FILE_SUBFIX;
-                res.push_back(url.str());
-                url.str("");
-            }
-            break;
-        }
-    }
-
-    return res;
+void MasterNode::StartMasterNode()
+{
+    rpcServer_->SetChangeJobStatusCallback(std::bind(&MasterNode::ChangeJobStatus, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+    rpcServer_->SetGetMapJobCallback(std::bind(&MasterNode::GetMapJob, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
+    rpcServer_->SetGetReduceJobCallback(std::bind(&MasterNode::GetReduceJob, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
+    rpcServer_->SetHeartBeatCallback(std::bind(&MasterNode::HeartBeatDetect, this, std::placeholders::_1)); /* 心跳检测回调实现 */
+    rpcServer_->RunRpcServer();
 }

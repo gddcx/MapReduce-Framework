@@ -56,6 +56,9 @@ namespace masterSlaveRPC {
 class EventMessage;
 struct EventMessageDefaultTypeInternal;
 extern EventMessageDefaultTypeInternal _EventMessage_default_instance_;
+class Id;
+struct IdDefaultTypeInternal;
+extern IdDefaultTypeInternal _Id_default_instance_;
 class JobMessage;
 struct JobMessageDefaultTypeInternal;
 extern JobMessageDefaultTypeInternal _JobMessage_default_instance_;
@@ -72,39 +75,39 @@ namespace protobuf {
 }  // namespace google
 
 namespace masterSlaveRPC {
-enum JobMessage_TaskType : int {
-  JobMessage_TaskType_map = 0,
-  JobMessage_TaskType_reduce = 1,
-  JobMessage_TaskType_fetch = 2,
-  JobMessage_TaskType_JobMessage_TaskType_INT_MIN_SENTINEL_DO_NOT_USE_ =
+enum TaskType : int {
+  map = 0,
+  reduce = 1,
+  fetch = 2,
+  TaskType_INT_MIN_SENTINEL_DO_NOT_USE_ =
       std::numeric_limits<::int32_t>::min(),
-  JobMessage_TaskType_JobMessage_TaskType_INT_MAX_SENTINEL_DO_NOT_USE_ =
+  TaskType_INT_MAX_SENTINEL_DO_NOT_USE_ =
       std::numeric_limits<::int32_t>::max(),
 };
 
-bool JobMessage_TaskType_IsValid(int value);
-extern const uint32_t JobMessage_TaskType_internal_data_[];
-constexpr JobMessage_TaskType JobMessage_TaskType_TaskType_MIN = static_cast<JobMessage_TaskType>(0);
-constexpr JobMessage_TaskType JobMessage_TaskType_TaskType_MAX = static_cast<JobMessage_TaskType>(2);
-constexpr int JobMessage_TaskType_TaskType_ARRAYSIZE = 2 + 1;
+bool TaskType_IsValid(int value);
+extern const uint32_t TaskType_internal_data_[];
+constexpr TaskType TaskType_MIN = static_cast<TaskType>(0);
+constexpr TaskType TaskType_MAX = static_cast<TaskType>(2);
+constexpr int TaskType_ARRAYSIZE = 2 + 1;
 const ::google::protobuf::EnumDescriptor*
-JobMessage_TaskType_descriptor();
+TaskType_descriptor();
 template <typename T>
-const std::string& JobMessage_TaskType_Name(T value) {
-  static_assert(std::is_same<T, JobMessage_TaskType>::value ||
+const std::string& TaskType_Name(T value) {
+  static_assert(std::is_same<T, TaskType>::value ||
                     std::is_integral<T>::value,
                 "Incorrect type passed to TaskType_Name().");
-  return JobMessage_TaskType_Name(static_cast<JobMessage_TaskType>(value));
+  return TaskType_Name(static_cast<TaskType>(value));
 }
 template <>
-inline const std::string& JobMessage_TaskType_Name(JobMessage_TaskType value) {
-  return ::google::protobuf::internal::NameOfDenseEnum<JobMessage_TaskType_descriptor,
+inline const std::string& TaskType_Name(TaskType value) {
+  return ::google::protobuf::internal::NameOfDenseEnum<TaskType_descriptor,
                                                  0, 2>(
       static_cast<int>(value));
 }
-inline bool JobMessage_TaskType_Parse(absl::string_view name, JobMessage_TaskType* value) {
-  return ::google::protobuf::internal::ParseNamedEnum<JobMessage_TaskType>(
-      JobMessage_TaskType_descriptor(), name, value);
+inline bool TaskType_Parse(absl::string_view name, TaskType* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<TaskType>(
+      TaskType_descriptor(), name, value);
 }
 
 // ===================================================================
@@ -344,7 +347,7 @@ class MapDataList final : public ::google::protobuf::Message
     return reinterpret_cast<const MapDataList*>(
         &_MapDataList_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 2;
+  static constexpr int kIndexInFileMessages = 3;
   friend void swap(MapDataList& a, MapDataList& b) { a.Swap(&b); }
   inline void Swap(MapDataList* other) {
     if (other == this) return;
@@ -478,23 +481,23 @@ class MapDataList final : public ::google::protobuf::Message
 };
 // -------------------------------------------------------------------
 
-class JobMessage final : public ::google::protobuf::Message
-/* @@protoc_insertion_point(class_definition:masterSlaveRPC.JobMessage) */ {
+class Id final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:masterSlaveRPC.Id) */ {
  public:
-  inline JobMessage() : JobMessage(nullptr) {}
-  ~JobMessage() override;
+  inline Id() : Id(nullptr) {}
+  ~Id() override;
   template <typename = void>
-  explicit PROTOBUF_CONSTEXPR JobMessage(
+  explicit PROTOBUF_CONSTEXPR Id(
       ::google::protobuf::internal::ConstantInitialized);
 
-  inline JobMessage(const JobMessage& from) : JobMessage(nullptr, from) {}
-  inline JobMessage(JobMessage&& from) noexcept
-      : JobMessage(nullptr, std::move(from)) {}
-  inline JobMessage& operator=(const JobMessage& from) {
+  inline Id(const Id& from) : Id(nullptr, from) {}
+  inline Id(Id&& from) noexcept
+      : Id(nullptr, std::move(from)) {}
+  inline Id& operator=(const Id& from) {
     CopyFrom(from);
     return *this;
   }
-  inline JobMessage& operator=(JobMessage&& from) noexcept {
+  inline Id& operator=(Id&& from) noexcept {
     if (this == &from) return *this;
     if (GetArena() == from.GetArena()
 #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
@@ -526,16 +529,16 @@ class JobMessage final : public ::google::protobuf::Message
   static const ::google::protobuf::Reflection* GetReflection() {
     return default_instance().GetMetadata().reflection;
   }
-  static const JobMessage& default_instance() {
+  static const Id& default_instance() {
     return *internal_default_instance();
   }
-  static inline const JobMessage* internal_default_instance() {
-    return reinterpret_cast<const JobMessage*>(
-        &_JobMessage_default_instance_);
+  static inline const Id* internal_default_instance() {
+    return reinterpret_cast<const Id*>(
+        &_Id_default_instance_);
   }
   static constexpr int kIndexInFileMessages = 1;
-  friend void swap(JobMessage& a, JobMessage& b) { a.Swap(&b); }
-  inline void Swap(JobMessage* other) {
+  friend void swap(Id& a, Id& b) { a.Swap(&b); }
+  inline void Swap(Id* other) {
     if (other == this) return;
 #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetArena() != nullptr && GetArena() == other->GetArena()) {
@@ -547,7 +550,7 @@ class JobMessage final : public ::google::protobuf::Message
       ::google::protobuf::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(JobMessage* other) {
+  void UnsafeArenaSwap(Id* other) {
     if (other == this) return;
     ABSL_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
@@ -555,13 +558,13 @@ class JobMessage final : public ::google::protobuf::Message
 
   // implements Message ----------------------------------------------
 
-  JobMessage* New(::google::protobuf::Arena* arena = nullptr) const final {
-    return ::google::protobuf::Message::DefaultConstruct<JobMessage>(arena);
+  Id* New(::google::protobuf::Arena* arena = nullptr) const final {
+    return ::google::protobuf::Message::DefaultConstruct<Id>(arena);
   }
   using ::google::protobuf::Message::CopyFrom;
-  void CopyFrom(const JobMessage& from);
+  void CopyFrom(const Id& from);
   using ::google::protobuf::Message::MergeFrom;
-  void MergeFrom(const JobMessage& from) { JobMessage::MergeImpl(*this, from); }
+  void MergeFrom(const Id& from) { Id::MergeImpl(*this, from); }
 
   private:
   static void MergeImpl(
@@ -582,16 +585,16 @@ class JobMessage final : public ::google::protobuf::Message
   private:
   void SharedCtor(::google::protobuf::Arena* arena);
   void SharedDtor();
-  void InternalSwap(JobMessage* other);
+  void InternalSwap(Id* other);
  private:
   friend class ::google::protobuf::internal::AnyMetadata;
-  static ::absl::string_view FullMessageName() { return "masterSlaveRPC.JobMessage"; }
+  static ::absl::string_view FullMessageName() { return "masterSlaveRPC.Id"; }
 
  protected:
-  explicit JobMessage(::google::protobuf::Arena* arena);
-  JobMessage(::google::protobuf::Arena* arena, const JobMessage& from);
-  JobMessage(::google::protobuf::Arena* arena, JobMessage&& from) noexcept
-      : JobMessage(arena) {
+  explicit Id(::google::protobuf::Arena* arena);
+  Id(::google::protobuf::Arena* arena, const Id& from);
+  Id(::google::protobuf::Arena* arena, Id&& from) noexcept
+      : Id(arena) {
     *this = ::std::move(from);
   }
   const ::google::protobuf::Message::ClassData* GetClassData() const final;
@@ -599,86 +602,43 @@ class JobMessage final : public ::google::protobuf::Message
  public:
   ::google::protobuf::Metadata GetMetadata() const;
   // nested types ----------------------------------------------------
-  using TaskType = JobMessage_TaskType;
-  static constexpr TaskType map = JobMessage_TaskType_map;
-  static constexpr TaskType reduce = JobMessage_TaskType_reduce;
-  static constexpr TaskType fetch = JobMessage_TaskType_fetch;
-  static inline bool TaskType_IsValid(int value) {
-    return JobMessage_TaskType_IsValid(value);
-  }
-  static constexpr TaskType TaskType_MIN = JobMessage_TaskType_TaskType_MIN;
-  static constexpr TaskType TaskType_MAX = JobMessage_TaskType_TaskType_MAX;
-  static constexpr int TaskType_ARRAYSIZE = JobMessage_TaskType_TaskType_ARRAYSIZE;
-  static inline const ::google::protobuf::EnumDescriptor* TaskType_descriptor() {
-    return JobMessage_TaskType_descriptor();
-  }
-  template <typename T>
-  static inline const std::string& TaskType_Name(T value) {
-    return JobMessage_TaskType_Name(value);
-  }
-  static inline bool TaskType_Parse(absl::string_view name, TaskType* value) {
-    return JobMessage_TaskType_Parse(name, value);
-  }
 
   // accessors -------------------------------------------------------
   enum : int {
-    kKeyFieldNumber = 2,
-    kValueFieldNumber = 3,
-    kTypeFieldNumber = 1,
+    kTaskIdFieldNumber = 1,
+    kJobIdFieldNumber = 2,
   };
-  // string key = 2;
-  void clear_key() ;
-  const std::string& key() const;
-  template <typename Arg_ = const std::string&, typename... Args_>
-  void set_key(Arg_&& arg, Args_... args);
-  std::string* mutable_key();
-  PROTOBUF_NODISCARD std::string* release_key();
-  void set_allocated_key(std::string* value);
+  // uint32 taskId = 1;
+  void clear_taskid() ;
+  ::uint32_t taskid() const;
+  void set_taskid(::uint32_t value);
 
   private:
-  const std::string& _internal_key() const;
-  inline PROTOBUF_ALWAYS_INLINE void _internal_set_key(
-      const std::string& value);
-  std::string* _internal_mutable_key();
+  ::uint32_t _internal_taskid() const;
+  void _internal_set_taskid(::uint32_t value);
 
   public:
-  // string value = 3;
-  void clear_value() ;
-  const std::string& value() const;
-  template <typename Arg_ = const std::string&, typename... Args_>
-  void set_value(Arg_&& arg, Args_... args);
-  std::string* mutable_value();
-  PROTOBUF_NODISCARD std::string* release_value();
-  void set_allocated_value(std::string* value);
+  // uint32 jobId = 2;
+  void clear_jobid() ;
+  ::uint32_t jobid() const;
+  void set_jobid(::uint32_t value);
 
   private:
-  const std::string& _internal_value() const;
-  inline PROTOBUF_ALWAYS_INLINE void _internal_set_value(
-      const std::string& value);
-  std::string* _internal_mutable_value();
+  ::uint32_t _internal_jobid() const;
+  void _internal_set_jobid(::uint32_t value);
 
   public:
-  // .masterSlaveRPC.JobMessage.TaskType type = 1;
-  void clear_type() ;
-  ::masterSlaveRPC::JobMessage_TaskType type() const;
-  void set_type(::masterSlaveRPC::JobMessage_TaskType value);
-
-  private:
-  ::masterSlaveRPC::JobMessage_TaskType _internal_type() const;
-  void _internal_set_type(::masterSlaveRPC::JobMessage_TaskType value);
-
-  public:
-  // @@protoc_insertion_point(class_scope:masterSlaveRPC.JobMessage)
+  // @@protoc_insertion_point(class_scope:masterSlaveRPC.Id)
  private:
   class _Internal;
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
-      2, 3, 0,
-      42, 2>
+      1, 2, 0,
+      0, 2>
       _table_;
 
   static constexpr const void* _raw_default_instance_ =
-      &_JobMessage_default_instance_;
+      &_Id_default_instance_;
 
   friend class ::google::protobuf::MessageLite;
   friend class ::google::protobuf::Arena;
@@ -693,10 +653,9 @@ class JobMessage final : public ::google::protobuf::Message
                           ::google::protobuf::Arena* arena);
     inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
                           ::google::protobuf::Arena* arena, const Impl_& from,
-                          const JobMessage& from_msg);
-    ::google::protobuf::internal::ArenaStringPtr key_;
-    ::google::protobuf::internal::ArenaStringPtr value_;
-    int type_;
+                          const Id& from_msg);
+    ::uint32_t taskid_;
+    ::uint32_t jobid_;
     mutable ::google::protobuf::internal::CachedSize _cached_size_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
@@ -759,7 +718,7 @@ class EventMessage final : public ::google::protobuf::internal::ZeroFieldsBase
     return reinterpret_cast<const EventMessage*>(
         &_EventMessage_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 3;
+  static constexpr int kIndexInFileMessages = 4;
   friend void swap(EventMessage& a, EventMessage& b) { a.Swap(&b); }
   inline void Swap(EventMessage* other) {
     if (other == this) return;
@@ -845,6 +804,231 @@ class EventMessage final : public ::google::protobuf::internal::ZeroFieldsBase
   };
   friend struct ::TableStruct_rpc_2eproto;
 };
+// -------------------------------------------------------------------
+
+class JobMessage final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:masterSlaveRPC.JobMessage) */ {
+ public:
+  inline JobMessage() : JobMessage(nullptr) {}
+  ~JobMessage() override;
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR JobMessage(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline JobMessage(const JobMessage& from) : JobMessage(nullptr, from) {}
+  inline JobMessage(JobMessage&& from) noexcept
+      : JobMessage(nullptr, std::move(from)) {}
+  inline JobMessage& operator=(const JobMessage& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline JobMessage& operator=(JobMessage&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetArena() == from.GetArena()
+#ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetArena() != nullptr
+#endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const JobMessage& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const JobMessage* internal_default_instance() {
+    return reinterpret_cast<const JobMessage*>(
+        &_JobMessage_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 2;
+  friend void swap(JobMessage& a, JobMessage& b) { a.Swap(&b); }
+  inline void Swap(JobMessage* other) {
+    if (other == this) return;
+#ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetArena() != nullptr && GetArena() == other->GetArena()) {
+#else   // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetArena() == other->GetArena()) {
+#endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(JobMessage* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  JobMessage* New(::google::protobuf::Arena* arena = nullptr) const final {
+    return ::google::protobuf::Message::DefaultConstruct<JobMessage>(arena);
+  }
+  using ::google::protobuf::Message::CopyFrom;
+  void CopyFrom(const JobMessage& from);
+  using ::google::protobuf::Message::MergeFrom;
+  void MergeFrom(const JobMessage& from) { JobMessage::MergeImpl(*this, from); }
+
+  private:
+  static void MergeImpl(
+      ::google::protobuf::MessageLite& to_msg,
+      const ::google::protobuf::MessageLite& from_msg);
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+  ABSL_ATTRIBUTE_REINITIALIZES void Clear() final;
+  ::size_t ByteSizeLong() const final;
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::google::protobuf::Arena* arena);
+  void SharedDtor();
+  void InternalSwap(JobMessage* other);
+ private:
+  friend class ::google::protobuf::internal::AnyMetadata;
+  static ::absl::string_view FullMessageName() { return "masterSlaveRPC.JobMessage"; }
+
+ protected:
+  explicit JobMessage(::google::protobuf::Arena* arena);
+  JobMessage(::google::protobuf::Arena* arena, const JobMessage& from);
+  JobMessage(::google::protobuf::Arena* arena, JobMessage&& from) noexcept
+      : JobMessage(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::Message::ClassData* GetClassData() const final;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  enum : int {
+    kKeyFieldNumber = 2,
+    kValueFieldNumber = 3,
+    kIdFieldNumber = 4,
+    kTypeFieldNumber = 1,
+  };
+  // string key = 2;
+  void clear_key() ;
+  const std::string& key() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_key(Arg_&& arg, Args_... args);
+  std::string* mutable_key();
+  PROTOBUF_NODISCARD std::string* release_key();
+  void set_allocated_key(std::string* value);
+
+  private:
+  const std::string& _internal_key() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_key(
+      const std::string& value);
+  std::string* _internal_mutable_key();
+
+  public:
+  // string value = 3;
+  void clear_value() ;
+  const std::string& value() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_value(Arg_&& arg, Args_... args);
+  std::string* mutable_value();
+  PROTOBUF_NODISCARD std::string* release_value();
+  void set_allocated_value(std::string* value);
+
+  private:
+  const std::string& _internal_value() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_value(
+      const std::string& value);
+  std::string* _internal_mutable_value();
+
+  public:
+  // .masterSlaveRPC.Id id = 4;
+  bool has_id() const;
+  void clear_id() ;
+  const ::masterSlaveRPC::Id& id() const;
+  PROTOBUF_NODISCARD ::masterSlaveRPC::Id* release_id();
+  ::masterSlaveRPC::Id* mutable_id();
+  void set_allocated_id(::masterSlaveRPC::Id* value);
+  void unsafe_arena_set_allocated_id(::masterSlaveRPC::Id* value);
+  ::masterSlaveRPC::Id* unsafe_arena_release_id();
+
+  private:
+  const ::masterSlaveRPC::Id& _internal_id() const;
+  ::masterSlaveRPC::Id* _internal_mutable_id();
+
+  public:
+  // .masterSlaveRPC.TaskType type = 1;
+  void clear_type() ;
+  ::masterSlaveRPC::TaskType type() const;
+  void set_type(::masterSlaveRPC::TaskType value);
+
+  private:
+  ::masterSlaveRPC::TaskType _internal_type() const;
+  void _internal_set_type(::masterSlaveRPC::TaskType value);
+
+  public:
+  // @@protoc_insertion_point(class_scope:masterSlaveRPC.JobMessage)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      2, 4, 1,
+      42, 2>
+      _table_;
+
+  static constexpr const void* _raw_default_instance_ =
+      &_JobMessage_default_instance_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const JobMessage& from_msg);
+    ::google::protobuf::internal::HasBits<1> _has_bits_;
+    mutable ::google::protobuf::internal::CachedSize _cached_size_;
+    ::google::protobuf::internal::ArenaStringPtr key_;
+    ::google::protobuf::internal::ArenaStringPtr value_;
+    ::masterSlaveRPC::Id* id_;
+    int type_;
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_rpc_2eproto;
+};
 
 // ===================================================================
 
@@ -914,26 +1098,74 @@ inline void NodeMessage::set_allocated_nodename(std::string* value) {
 
 // -------------------------------------------------------------------
 
+// Id
+
+// uint32 taskId = 1;
+inline void Id::clear_taskid() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.taskid_ = 0u;
+}
+inline ::uint32_t Id::taskid() const {
+  // @@protoc_insertion_point(field_get:masterSlaveRPC.Id.taskId)
+  return _internal_taskid();
+}
+inline void Id::set_taskid(::uint32_t value) {
+  _internal_set_taskid(value);
+  // @@protoc_insertion_point(field_set:masterSlaveRPC.Id.taskId)
+}
+inline ::uint32_t Id::_internal_taskid() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.taskid_;
+}
+inline void Id::_internal_set_taskid(::uint32_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.taskid_ = value;
+}
+
+// uint32 jobId = 2;
+inline void Id::clear_jobid() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.jobid_ = 0u;
+}
+inline ::uint32_t Id::jobid() const {
+  // @@protoc_insertion_point(field_get:masterSlaveRPC.Id.jobId)
+  return _internal_jobid();
+}
+inline void Id::set_jobid(::uint32_t value) {
+  _internal_set_jobid(value);
+  // @@protoc_insertion_point(field_set:masterSlaveRPC.Id.jobId)
+}
+inline ::uint32_t Id::_internal_jobid() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.jobid_;
+}
+inline void Id::_internal_set_jobid(::uint32_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.jobid_ = value;
+}
+
+// -------------------------------------------------------------------
+
 // JobMessage
 
-// .masterSlaveRPC.JobMessage.TaskType type = 1;
+// .masterSlaveRPC.TaskType type = 1;
 inline void JobMessage::clear_type() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.type_ = 0;
 }
-inline ::masterSlaveRPC::JobMessage_TaskType JobMessage::type() const {
+inline ::masterSlaveRPC::TaskType JobMessage::type() const {
   // @@protoc_insertion_point(field_get:masterSlaveRPC.JobMessage.type)
   return _internal_type();
 }
-inline void JobMessage::set_type(::masterSlaveRPC::JobMessage_TaskType value) {
+inline void JobMessage::set_type(::masterSlaveRPC::TaskType value) {
   _internal_set_type(value);
   // @@protoc_insertion_point(field_set:masterSlaveRPC.JobMessage.type)
 }
-inline ::masterSlaveRPC::JobMessage_TaskType JobMessage::_internal_type() const {
+inline ::masterSlaveRPC::TaskType JobMessage::_internal_type() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
-  return static_cast<::masterSlaveRPC::JobMessage_TaskType>(_impl_.type_);
+  return static_cast<::masterSlaveRPC::TaskType>(_impl_.type_);
 }
-inline void JobMessage::_internal_set_type(::masterSlaveRPC::JobMessage_TaskType value) {
+inline void JobMessage::_internal_set_type(::masterSlaveRPC::TaskType value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.type_ = value;
 }
@@ -1036,6 +1268,102 @@ inline void JobMessage::set_allocated_value(std::string* value) {
         }
   #endif  // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   // @@protoc_insertion_point(field_set_allocated:masterSlaveRPC.JobMessage.value)
+}
+
+// .masterSlaveRPC.Id id = 4;
+inline bool JobMessage::has_id() const {
+  bool value = (_impl_._has_bits_[0] & 0x00000001u) != 0;
+  PROTOBUF_ASSUME(!value || _impl_.id_ != nullptr);
+  return value;
+}
+inline void JobMessage::clear_id() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (_impl_.id_ != nullptr) _impl_.id_->Clear();
+  _impl_._has_bits_[0] &= ~0x00000001u;
+}
+inline const ::masterSlaveRPC::Id& JobMessage::_internal_id() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  const ::masterSlaveRPC::Id* p = _impl_.id_;
+  return p != nullptr ? *p : reinterpret_cast<const ::masterSlaveRPC::Id&>(::masterSlaveRPC::_Id_default_instance_);
+}
+inline const ::masterSlaveRPC::Id& JobMessage::id() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:masterSlaveRPC.JobMessage.id)
+  return _internal_id();
+}
+inline void JobMessage::unsafe_arena_set_allocated_id(::masterSlaveRPC::Id* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::google::protobuf::MessageLite*>(_impl_.id_);
+  }
+  _impl_.id_ = reinterpret_cast<::masterSlaveRPC::Id*>(value);
+  if (value != nullptr) {
+    _impl_._has_bits_[0] |= 0x00000001u;
+  } else {
+    _impl_._has_bits_[0] &= ~0x00000001u;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:masterSlaveRPC.JobMessage.id)
+}
+inline ::masterSlaveRPC::Id* JobMessage::release_id() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+
+  _impl_._has_bits_[0] &= ~0x00000001u;
+  ::masterSlaveRPC::Id* released = _impl_.id_;
+  _impl_.id_ = nullptr;
+#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+  auto* old = reinterpret_cast<::google::protobuf::MessageLite*>(released);
+  released = ::google::protobuf::internal::DuplicateIfNonNull(released);
+  if (GetArena() == nullptr) {
+    delete old;
+  }
+#else   // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArena() != nullptr) {
+    released = ::google::protobuf::internal::DuplicateIfNonNull(released);
+  }
+#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+  return released;
+}
+inline ::masterSlaveRPC::Id* JobMessage::unsafe_arena_release_id() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:masterSlaveRPC.JobMessage.id)
+
+  _impl_._has_bits_[0] &= ~0x00000001u;
+  ::masterSlaveRPC::Id* temp = _impl_.id_;
+  _impl_.id_ = nullptr;
+  return temp;
+}
+inline ::masterSlaveRPC::Id* JobMessage::_internal_mutable_id() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (_impl_.id_ == nullptr) {
+    auto* p = ::google::protobuf::Message::DefaultConstruct<::masterSlaveRPC::Id>(GetArena());
+    _impl_.id_ = reinterpret_cast<::masterSlaveRPC::Id*>(p);
+  }
+  return _impl_.id_;
+}
+inline ::masterSlaveRPC::Id* JobMessage::mutable_id() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  _impl_._has_bits_[0] |= 0x00000001u;
+  ::masterSlaveRPC::Id* _msg = _internal_mutable_id();
+  // @@protoc_insertion_point(field_mutable:masterSlaveRPC.JobMessage.id)
+  return _msg;
+}
+inline void JobMessage::set_allocated_id(::masterSlaveRPC::Id* value) {
+  ::google::protobuf::Arena* message_arena = GetArena();
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (message_arena == nullptr) {
+    delete (_impl_.id_);
+  }
+
+  if (value != nullptr) {
+    ::google::protobuf::Arena* submessage_arena = (value)->GetArena();
+    if (message_arena != submessage_arena) {
+      value = ::google::protobuf::internal::GetOwnedMessage(message_arena, value, submessage_arena);
+    }
+    _impl_._has_bits_[0] |= 0x00000001u;
+  } else {
+    _impl_._has_bits_[0] &= ~0x00000001u;
+  }
+
+  _impl_.id_ = reinterpret_cast<::masterSlaveRPC::Id*>(value);
+  // @@protoc_insertion_point(field_set_allocated:masterSlaveRPC.JobMessage.id)
 }
 
 // -------------------------------------------------------------------
@@ -1160,10 +1488,10 @@ namespace google {
 namespace protobuf {
 
 template <>
-struct is_proto_enum<::masterSlaveRPC::JobMessage_TaskType> : std::true_type {};
+struct is_proto_enum<::masterSlaveRPC::TaskType> : std::true_type {};
 template <>
-inline const EnumDescriptor* GetEnumDescriptor<::masterSlaveRPC::JobMessage_TaskType>() {
-  return ::masterSlaveRPC::JobMessage_TaskType_descriptor();
+inline const EnumDescriptor* GetEnumDescriptor<::masterSlaveRPC::TaskType>() {
+  return ::masterSlaveRPC::TaskType_descriptor();
 }
 
 }  // namespace protobuf

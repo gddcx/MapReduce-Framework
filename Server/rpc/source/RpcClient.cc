@@ -18,12 +18,12 @@ bool RpcClient::Require(NodeMessage& nodeMsg, JobMessage& jobMsg)
     return MR_ERROR;
 }
 
-void RpcClient::JobFinished(NodeMessage& nodeMsg)
+void RpcClient::JobFinished(JobMessage& jobMsg)
 {
     ClientContext context;
     google::protobuf::Empty res;
 
-    Status status = stub_->ReportJobStatus(&context, nodeMsg, &res);
+    Status status = stub_->ReportJobStatus(&context, jobMsg, &res);
     if(!status.ok())
     {
         std::cout << "Fail to report finish status" << std::endl;
@@ -41,4 +41,16 @@ bool RpcClient::Fetch(NodeMessage& nodeMsg, MapDataList& mapDataList)
         return MR_OK;
     }
     return MR_ERROR;
+}
+
+void RpcClient::HeartBeat(NodeMessage& nodeMsg)
+{
+    ClientContext context;
+    google::protobuf::Empty res;
+
+    Status status = stub_->HeartBeat(&context, nodeMsg, &res);
+    if(status.ok())
+    {
+        std::cout << nodeMsg.nodename() << ": upload heart bear" << std::endl;
+    }
 }

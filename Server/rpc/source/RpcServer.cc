@@ -25,16 +25,27 @@ Status RpcServer::RequireJob(ServerContext* context, const NodeMessage* nodeMsg,
 {
     std::string key;
     std::string value;
-    if(GetMapJobCallback_(nodeMsg->nodename(), key, value) == MR_OK) // 有map工作未启动
+    uint taskId;
+    uint jobId;
+    Id id;
+    if(GetReduceJobCallback_(nodeMsg->nodename(), key, value, taskId, jobId) == MR_OK)
     {
         jobMsg->set_key(key);
         jobMsg->set_value(value);
-        jobMsg->set_type(masterSlaveRPC::JobMessage_TaskType_map);
+        jobMsg->set_type(masterSlaveRPC::TaskType::map);
+        id.set_taskid(taskId);
+        id.set_jobid(jobId);
+        jobMsg->set_allocated_id(&id);
         return Status::OK;
     }
-    else if(GetReduceJobNumCallback_() > 0)
+    else if(GetMapJobCallback_(nodeMsg->nodename(), key, value, taskId, jobId) == MR_OK)
     {
-        jobMsg->set_type(masterSlaveRPC::JobMessage_TaskType_reduce);
+        jobMsg->set_key(key);
+        jobMsg->set_value(value);
+        jobMsg->set_type(masterSlaveRPC::TaskType::map);
+        id.set_taskid(taskId);
+        id.set_jobid(jobId);
+        jobMsg->set_allocated_id(&id);
         return Status::OK;
     }
     else
@@ -45,10 +56,9 @@ Status RpcServer::RequireJob(ServerContext* context, const NodeMessage* nodeMsg,
     return Status(StatusCode::UNAVAILABLE, "no available job!");
 }
 
-Status RpcServer::ReportJobStatus(ServerContext* context, const NodeMessage* nodeMsg, Empty* response)
+Status RpcServer::ReportJobStatus(ServerContext* context, const JobMessage* jobMsg, Empty* response)
 {
-    std::string nodeName = nodeMsg->nodename();
-    ChangeWorkStatusCallback_(nodeName);
+    ChangeWorkStatusCallback_(jobMsg->type(), jobMsg->id().taskid(), jobMsg->id().jobid());
     return Status::OK;
 }
 
@@ -64,17 +74,25 @@ Status RpcServer::FetchDataFromMap(ServerContext* context, const NodeMessage* no
     return Status::OK;
 }
 
-void RpcServer::SetGetMapJobCallback(std::function<bool(std::string, std::string&, std::string&)> GetMapJobCallback)
+Status RpcServer::HeartBeat(ServerContext* context, const NodeMessage* nodeMsg, Empty* response)
+{
+    std::string nodeName = nodeMsg->nodename();
+    HeartBeatCallback_(nodeName);
+
+    return Status::OK;
+}
+
+void RpcServer::SetGetMapJobCallback(std::function<bool(std::string, std::string&, std::string&, uint&, uint&)> GetMapJobCallback)
 {
     GetMapJobCallback_ = GetMapJobCallback;
 }
 
-void RpcServer::SetGetReduceJobNumCallback(std::function<int()> GetReduceJobNumCallback)
+void RpcServer::SetGetReduceJobCallback(std::function<bool(std::string, std::string&, std::string&, uint&, uint&)> GetReduceJobCallback)
 {
-    GetReduceJobNumCallback_ = GetReduceJobNumCallback;
+    GetReduceJobCallback_ = GetReduceJobCallback;
 }
 
-void RpcServer::SetChangeWorkStatusCallback(std::function<void(std::string&)> ChangeWorkStatusCallback)
+void RpcServer::SetChangeJobStatusCallback(std::function<void(int, uint, uint)> ChangeWorkStatusCallback)
 {
     ChangeWorkStatusCallback_ = ChangeWorkStatusCallback;
 }
@@ -82,4 +100,9 @@ void RpcServer::SetChangeWorkStatusCallback(std::function<void(std::string&)> Ch
 void RpcServer::SetGetIntermediateFileCallback(std::function<std::vector<std::string>(std::string)> GetIntermediateFileCallback)
 {
     GetIntermediateFileCallback_ = GetIntermediateFileCallback;
+}
+
+void RpcServer::SetHeartBeatCallback(std::function<void(std::string&)> HeartBeatCallback)
+{
+    HeartBeatCallback_ = HeartBeatCallback;
 }

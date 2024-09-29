@@ -11,7 +11,7 @@ using masterSlaveRPC::JobRpc;
 using masterSlaveRPC::NodeMessage;
 using masterSlaveRPC::JobMessage;
 using masterSlaveRPC::EventMessage;
-using masterSlaveRPC::JobMessage_TaskType;
+using masterSlaveRPC::TaskType;
 using masterSlaveRPC::MapDataList;
 
 class RpcClient
@@ -21,6 +21,7 @@ private:
 public:
     RpcClient(std::string& target);
     bool Require(NodeMessage& nodeMsg, JobMessage& jobMsg);
-    void JobFinished(NodeMessage& nodeMsg);
+    void JobFinished(JobMessage& jobMsg);
     bool Fetch(NodeMessage& nodeMsg, MapDataList& mapDataList);
+    void HeartBeat(NodeMessage& nodeMsg);
 };

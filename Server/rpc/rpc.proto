@@ -7,21 +7,30 @@ package masterSlaveRPC;
 service JobRpc {
   rpc RequireJob (NodeMessage) returns (JobMessage) {}
   rpc FetchDataFromMap(NodeMessage) returns (MapDataList) {}
-  rpc ReportJobStatus(NodeMessage) returns (google.protobuf.Empty) {}
+  rpc ReportJobStatus(JobMessage) returns (google.protobuf.Empty) {}
   rpc ReportEvent(EventMessage) returns (google.protobuf.Empty) {}
+  rpc HeartBeat(NodeMessage) returns (google.protobuf.Empty) {}
 }
 message NodeMessage {
     string nodeName = 1;
 }
+
+message Id {
+    uint32 taskId = 1;
+    uint32 jobId = 2;
+}
+
+enum TaskType {
+    map = 0;
+    reduce = 1;
+    fetch = 2;
+}
+
 message JobMessage {
-    enum TaskType {
-        map = 0;
-        reduce = 1;
-        fetch = 2;
-    }
     TaskType type = 1;
     string key = 2;
     string value = 3;
+    Id id = 4;
 }
 
 message MapDataList {
