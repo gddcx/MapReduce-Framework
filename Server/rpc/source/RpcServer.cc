@@ -28,6 +28,7 @@ Status RpcServer::RequireJob(ServerContext* context, const NodeMessage* nodeMsg,
     uint taskId;
     uint jobId;
     Id id;
+    uint jobNum = 0;
     if(GetReduceJobCallback_(nodeMsg->nodename(), key, value, taskId, jobId) == MR_OK)
     {
         jobMsg->set_key(key);
@@ -38,7 +39,7 @@ Status RpcServer::RequireJob(ServerContext* context, const NodeMessage* nodeMsg,
         jobMsg->set_allocated_id(&id);
         return Status::OK;
     }
-    else if(GetMapJobCallback_(nodeMsg->nodename(), key, value, taskId, jobId) == MR_OK)
+    else if(GetMapJobCallback_(nodeMsg->nodename(), key, value, taskId, jobId, jobNum) == MR_OK)
     {
         jobMsg->set_key(key);
         jobMsg->set_value(value);
@@ -46,6 +47,7 @@ Status RpcServer::RequireJob(ServerContext* context, const NodeMessage* nodeMsg,
         id.set_taskid(taskId);
         id.set_jobid(jobId);
         jobMsg->set_allocated_id(&id);
+        jobMsg->set_jobnum(jobNum);
         return Status::OK;
     }
     else
@@ -62,18 +64,6 @@ Status RpcServer::ReportJobStatus(ServerContext* context, const JobMessage* jobM
     return Status::OK;
 }
 
-Status RpcServer::FetchDataFromMap(ServerContext* context, const NodeMessage* nodeMsg, MapDataList* mapDataList)
-{
-    std::stringstream url;
-
-    for(const auto& url: GetIntermediateFileCallback_(nodeMsg->nodename()))
-    {
-        mapDataList->add_filename(url);
-    }
-
-    return Status::OK;
-}
-
 Status RpcServer::HeartBeat(ServerContext* context, const NodeMessage* nodeMsg, Empty* response)
 {
     std::string nodeName = nodeMsg->nodename();
@@ -82,7 +72,7 @@ Status RpcServer::HeartBeat(ServerContext* context, const NodeMessage* nodeMsg, 
     return Status::OK;
 }
 
-void RpcServer::SetGetMapJobCallback(std::function<bool(std::string, std::string&, std::string&, uint&, uint&)> GetMapJobCallback)
+void RpcServer::SetGetMapJobCallback(std::function<bool(std::string, std::string&, std::string&, uint&, uint&, uint&)> GetMapJobCallback)
 {
     GetMapJobCallback_ = GetMapJobCallback;
 }

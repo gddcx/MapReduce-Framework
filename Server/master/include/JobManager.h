@@ -8,7 +8,7 @@
 #define JOB_RUNNNING        1
 #define JOB_FINISHED        2
 #define JOB_WAITING         3 // 只给Reduce初始化用。目前策略是等待所有Map完成后才开始Reduce，Map全部完成后WAITTING->NO_START
-                              // TODO:没有地方检查Map是否全部完成
+
 enum JobType{
     MAP_JOB = 0,
     REDUCE_JOB,
@@ -16,7 +16,7 @@ enum JobType{
 
 struct JobDesp
 {
-    uint jobId_;
+    uint jobId_ = 0;
     std::string key_;            // 需要处理的key
     std::string value_;          // 需要处理的value
     std::string workerNodeName_; // 执行任务的节点名称
@@ -36,10 +36,12 @@ struct JobDesp
 */
 struct TaskDesp
 {
-    uint jobCnt_;
+    uint jobCnt_ = 0;
     uint noStartMapJobNum_ = 0;
+    uint finishedMapJobNum_ = 0;
     std::unordered_map<uint, JobDesp> mapJob_;
     uint noStartReduceJobNum_ = 0;
+    uint finishedReduceJobNum_ = 0;
     std::unordered_map<uint, JobDesp> reduceJob_;
 };
 
@@ -50,7 +52,7 @@ private:
     std::unordered_map<uint, TaskDesp> tasks_;
 public:
     uint JmAddNewTask(std::vector<std::string>& keys, std::vector<std::string>& values, int reduceJobNum);
-    bool JmAllocMapJob(std::string& key, std::string& value, std::string& nodeName, uint& taskId, uint& jobId);
-    bool JmAllocReduceJob(std::string& key, std::string& value, std::string& nodeName, uint& taskId, uint& jobId);
+    bool JmAllocMapJob(std::string& nodeName, std::string& key, std::string& value, uint& taskId, uint& jobId, uint& reduceJobNum);
+    bool JmAllocReduceJob(std::string& nodeName, std::string& key, std::string& value, uint& taskId, uint& jobId);
     void JmChangeJobStatus(JobType JobType, uint taskId, uint jobId);
 };

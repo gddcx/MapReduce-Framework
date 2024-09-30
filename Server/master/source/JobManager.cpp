@@ -31,7 +31,7 @@ uint JobManager::JmAddNewTask(std::vector<std::string>& keys, std::vector<std::s
     return taskId_++;
 }
 
-bool JobManager::JmAllocMapJob(std::string& key, std::string& value, std::string& nodeName, uint& taskId, uint& jobId)
+bool JobManager::JmAllocMapJob(std::string& nodeName, std::string& key, std::string& value, uint& taskId, uint& jobId, uint& reduceJobNum)
 {
     auto taskIt = tasks_.begin();
     for(; taskIt != tasks_.end(); taskIt++)
@@ -49,6 +49,7 @@ bool JobManager::JmAllocMapJob(std::string& key, std::string& value, std::string
                     value = jobDesp->second.value_;
                     taskId = taskIt->first;
                     jobId = jobDesp->first;
+                    reduceJobNum = taskIt->second.reduceJob_.size();
                     taskIt->second.noStartMapJobNum_--;
                     return MR_OK;
                 }
@@ -58,7 +59,7 @@ bool JobManager::JmAllocMapJob(std::string& key, std::string& value, std::string
     return MR_ERROR;
 }
 
-bool JobManager::JmAllocReduceJob(std::string& key, std::string& value, std::string& nodeName, uint& taskId, uint& jobId)
+bool JobManager::JmAllocReduceJob(std::string& nodeName, std::string& key, std::string& value, uint& taskId, uint& jobId)
 {
     auto taskIt = tasks_.begin();
     for(; taskIt != tasks_.end(); taskIt++)
@@ -88,13 +89,37 @@ bool JobManager::JmAllocReduceJob(std::string& key, std::string& value, std::str
 void JobManager::JmChangeJobStatus(JobType JobType, uint taskId, uint jobId)
 {
     const auto& task = tasks_.find(taskId);
-    if((task != tasks_.end()) && (JobType == MAP_JOB))
+    if(task != tasks_.end())
     {
-        auto& mapJob = task->second.mapJob_;
-        const auto& job = mapJob.find(jobId);
-        if(job != mapJob.end())
+        if(JobType == MAP_JOB)
         {
-            job->second.status_ = JOB_FINISHED;
+            auto& mapJob = task->second.mapJob_;
+            const auto& job = mapJob.find(jobId);
+            if(job != mapJob.end())
+            {
+                task->second.finishedMapJobNum_++;
+                job->second.status_ = JOB_FINISHED;
+            }
+            if(task->second.finishedMapJobNum_ == mapJob.size())
+            {
+                auto& reduceJob = task->second.reduceJob_;
+                auto reduceIt = reduceJob.begin();
+                while(reduceIt != reduceJob.end())
+                {
+                    reduceIt->second.status_ = JOB_NO_START;
+                    reduceIt++;
+                }
+            }
+        }
+        else if(JobType == REDUCE_JOB)
+        {
+            auto& reduceJob = task->second.reduceJob_;
+            const auto& job = reduceJob.find(jobId);
+            if(job != reduceJob.end())
+            {
+                task->second.finishedReduceJobNum_++;
+                job->second.status_ = JOB_FINISHED;
+            }
         }
     }
 }

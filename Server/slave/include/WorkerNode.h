@@ -3,6 +3,8 @@
 #include "RpcClient.h"
 #include "MapReduceBase.h"
 
+#define INTERMEDIATE_FOLDER   "/home/dengchangxing/projects/MIT6824/Test/intermediate/"
+
 class WorkerNode
 {
 private:
@@ -18,9 +20,10 @@ public:
 
 private:
     void ExecuteJob(JobMessage jobMsg);
-    void Partition(std::vector<std::pair<std::string, int>>& mapRes);
+    void Partition(std::vector<std::pair<std::string, int>>& mapRes, uint partNum);
     void LoadPartition(const std::string& filename, std::vector<std::pair<std::string, int>>& partition);
-    void FetchIntermediaData(MapDataList& mapDataList);
+    void FetchIntermediaData(uint& taskId, uint& jobId, std::string& filename, std::vector<std::string>& filenameVec);
+    void Merge(std::vector<std::pair<std::string, int>>& partition, std::unordered_map<std::string, int>& res);
 public:
     ~WorkerNode();
     void CreateRpcClient(std::string& target);

@@ -1,9 +1,12 @@
 #include <thread>
 #include <set>
+#include <unordered_map>
 #include <fstream>
 #include <iostream>
-#include "WorkerNode.h"
+#include <stdlib.h>
 #include <dlfcn.h>
+#include <algorithm>
+#include "WorkerNode.h"
 #include "Timer.h"
 #include "public.h"
 #include "MapReduceBase.h"
@@ -62,62 +65,73 @@ void WorkerNode::RequireJob()
     }
 }
 
+void WorkerNode::Merge(std::vector<std::pair<std::string, int>>& partition, std::unordered_map<std::string, int>& res)
+{
+    for(const auto& pair: partition)
+    {
+        res[pair.first] += pair.second;
+    }
+}
+
 void WorkerNode::ExecuteJob(JobMessage jobMsg)
 {
     std::vector<std::pair<std::string, int>> mapRes;
-    JobMessage_TaskType taskType = jobMsg.type();
+    TaskType taskType = jobMsg.type();
     std::string key = jobMsg.key();
     std::string value = jobMsg.value();
+    const Id& id = jobMsg.id();
+    uint taskId = id.taskid();
+    uint jobId = id.jobid();
+    uint jobNum = jobMsg.jobnum();
     switch(taskType)
     {
-        /* TODO: mrObj_ 初始化*/
-        case JobMessage_TaskType::JobMessage_TaskType_map:
+        case TaskType::map:
         {
+            std::string cmd = "mkdir -p " + std::string(INTERMEDIATE_FOLDER) + std::to_string(taskId) + "/" + std::to_string(jobId);
+            system(cmd.c_str());
             mapRes = mrObj_->Map(key, value);
-            Partition(mapRes); // partition
+            Partition(mapRes, jobNum);
             break;
         }
-        case JobMessage_TaskType::JobMessage_TaskType_reduce:
+        case TaskType::reduce:
         {
-            MapDataList mapDataList;
             std::vector<std::pair<std::string, int>> partition;
-            std::vector<std::pair<std::string, int>> mergePartitions;
-            FetchIntermediaData(mapDataList);
-            for(auto& filename: mapDataList.filename())
+            std::unordered_map<std::string, int> res;
+            std::vector<std::string> filenameVec;
+            std::vector<std::string> keys;
+            std::vector<int> values;
+            FetchIntermediaData(taskId, jobId, key, filenameVec);
+            for(auto& filename: filenameVec)
             {
                 LoadPartition(filename, partition);
-                mergePartitions.insert(mergePartitions.end(), partition.begin(), partition.end());
+                Merge(partition, res);
                 std::vector<std::pair<std::string, int>>().swap(partition);
             }
-            mrObj_->Reduce(key, mergePartitions);
+            std::transform(res.begin(), res.end(), std::back_inserter(keys), [](const std::pair<std::string, int>& p){ return p.first; });
+            std::transform(res.begin(), res.end(), std::back_inserter(values), [](const std::pair<std::string, int>& p) { return p.second; });
+            mrObj_->Reduce(keys, values);
             break;
         }
         default:
             break;
     }
-    {
-        /* TODO:先假设每次只有一个job，后面加job ID，用来创建Job的文件夹，同时上报完成的Job是哪一个 */
-        NodeMessage nodeMsg;
-        nodeMsg.set_nodename(nodeName_);
-        rpcClient_->JobFinished(nodeMsg);
-    }
+    rpcClient_->JobFinished(jobMsg);
 }
 
-void WorkerNode::Partition(std::vector<std::pair<std::string, int>>& mapRes)
+void WorkerNode::Partition(std::vector<std::pair<std::string, int>>& mapRes, uint partNum)
 {   
-    int reducerNum = 2;
-    std::vector<std::vector<std::pair<std::string, int>>> partitions(reducerNum);
+    std::vector<std::vector<std::pair<std::string, int>>> partitions(partNum);
     std::vector<std::pair<std::string, int>>::const_iterator it;
     std::hash<std::string> hash_fn;
     for(it = mapRes.begin(); it!=mapRes.end(); it++)
     {
-        partitions[hash_fn((*it).first) % reducerNum].emplace_back(*it);
+        partitions[hash_fn((*it).first) % partNum].emplace_back(*it);
     }
     std::stringstream filename;
     std::ofstream fd;
     std::size_t size;
     std::size_t pairStrSize;
-    for(int reducerId = 0; reducerId < reducerNum; reducerId++)
+    for(int reducerId = 0; reducerId < partNum; reducerId++)
     {   
         filename << INTERMEDIATE_FILE_PREFIX << reducerId << INTERMEDIATE_FILE_SUBFIX;
         fd.open(filename.str(), std::ios::out | std::ios::binary);
@@ -150,20 +164,28 @@ void WorkerNode::LoadPartition(const std::string& filename, std::vector<std::pai
     for(auto& pair: partition)
     {
         fd.read(reinterpret_cast<char*>(&tmpStrSize), sizeof(tmpStrSize));
+        pair.first.resize(tmpStrSize);
         fd.read(&pair.first[0], tmpStrSize);
         fd.read(reinterpret_cast<char*>(&pair.second), sizeof(pair.second));
     }
     fd.close();
 }
 
-void WorkerNode::FetchIntermediaData(MapDataList& mapDataList)
+void WorkerNode::FetchIntermediaData(uint& taskId, uint& jobId, std::string& filename, std::vector<std::string>& filenameVec)
+{
+    std::string path = INTERMEDIATE_FOLDER + std::to_string(taskId) + "/";
+    for(int loop = 0; loop < jobId; loop++)
+    {
+        filenameVec.emplace_back(path + std::to_string(loop) + "/" + filename);
+    }
+}
+
+void WorkerNode::HeartBeat()
 {
     NodeMessage nodeMsg;
     nodeMsg.set_nodename(nodeName_);
-    rpcClient_->Fetch(nodeMsg, mapDataList);
+    rpcClient_->HeartBeat(nodeMsg);
 }
-
-void WorkerNode::HeartBeat() {}
 
 void WorkerNode::StartWorkerNode(std::string libPath)
 {
@@ -174,7 +196,7 @@ void WorkerNode::StartWorkerNode(std::string libPath)
     }
 
     Timer timer;
-    timer.AddTimer(1500, std::bind(&WorkerNode::HeartBeat, this), true); /* 5000ms上报心跳 */
+    timer.AddTimer(5000, std::bind(&WorkerNode::HeartBeat, this), true); /* 5000ms上报心跳 */
     timer.AddTimer(2000, std::bind(&WorkerNode::RequireJob, this), true); /* busy不要请求任务 */
     for(;;)
     {

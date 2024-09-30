@@ -23,7 +23,6 @@ class RpcServer final: public JobRpc::Service
 private:
     std::string rpcListen_;
     Status RequireJob(ServerContext* context, const NodeMessage* nodeMsg, JobMessage* jobMsg) override;
-    Status FetchDataFromMap(ServerContext* context, const NodeMessage* nodeMsg, MapDataList* mapDataList) override;
     Status ReportJobStatus(ServerContext* context, const JobMessage* nodeMsg, Empty* response) override;
     Status HeartBeat(ServerContext* context, const NodeMessage* nodeMsg, Empty* response) override;
 public:
@@ -31,13 +30,13 @@ public:
     RpcServer(std::string& rpcListen);
     void RunRpcServer();
 private:
-    std::function<bool(std::string, std::string&, std::string&, uint&, uint&)> GetMapJobCallback_;
+    std::function<bool(std::string, std::string&, std::string&, uint&, uint&, uint&)> GetMapJobCallback_;
     std::function<bool(std::string, std::string&, std::string&, uint&, uint&)> GetReduceJobCallback_;
     std::function<void(int, uint, uint)> ChangeWorkStatusCallback_;
     std::function<std::vector<std::string>(std::string)> GetIntermediateFileCallback_;
     std::function<void(std::string&)> HeartBeatCallback_;
 public:
-    void SetGetMapJobCallback(std::function<bool(std::string, std::string&, std::string&, uint&, uint&)>);
+    void SetGetMapJobCallback(std::function<bool(std::string, std::string&, std::string&, uint&, uint&, uint&)>);
     void SetGetReduceJobCallback(std::function<bool(std::string, std::string&, std::string&, uint&, uint&)>);
     void SetChangeJobStatusCallback(std::function<void(int, uint, uint)>);
     void SetGetIntermediateFileCallback(std::function<std::vector<std::string>(std::string)>);

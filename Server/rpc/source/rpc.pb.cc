@@ -107,7 +107,8 @@ inline constexpr JobMessage::Impl_::Impl_(
             &::google::protobuf::internal::fixed_address_empty_string,
             ::_pbi::ConstantInitialized()),
         id_{nullptr},
-        type_{static_cast< ::masterSlaveRPC::TaskType >(0)} {}
+        type_{static_cast< ::masterSlaveRPC::TaskType >(0)},
+        jobnum_{0u} {}
 
 template <typename>
 PROTOBUF_CONSTEXPR JobMessage::JobMessage(::_pbi::ConstantInitialized)
@@ -160,10 +161,12 @@ const ::uint32_t
         PROTOBUF_FIELD_OFFSET(::masterSlaveRPC::JobMessage, _impl_.key_),
         PROTOBUF_FIELD_OFFSET(::masterSlaveRPC::JobMessage, _impl_.value_),
         PROTOBUF_FIELD_OFFSET(::masterSlaveRPC::JobMessage, _impl_.id_),
+        PROTOBUF_FIELD_OFFSET(::masterSlaveRPC::JobMessage, _impl_.jobnum_),
         ~0u,
         ~0u,
         ~0u,
         0,
+        ~0u,
         ~0u,  // no _has_bits_
         PROTOBUF_FIELD_OFFSET(::masterSlaveRPC::MapDataList, _internal_metadata_),
         ~0u,  // no _extensions_
@@ -187,9 +190,9 @@ static const ::_pbi::MigrationSchema
     schemas[] ABSL_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
         {0, -1, -1, sizeof(::masterSlaveRPC::NodeMessage)},
         {9, -1, -1, sizeof(::masterSlaveRPC::Id)},
-        {19, 31, -1, sizeof(::masterSlaveRPC::JobMessage)},
-        {35, -1, -1, sizeof(::masterSlaveRPC::MapDataList)},
-        {44, -1, -1, sizeof(::masterSlaveRPC::EventMessage)},
+        {19, 32, -1, sizeof(::masterSlaveRPC::JobMessage)},
+        {37, -1, -1, sizeof(::masterSlaveRPC::MapDataList)},
+        {46, -1, -1, sizeof(::masterSlaveRPC::EventMessage)},
 };
 static const ::_pb::Message* const file_default_instances[] = {
     &::masterSlaveRPC::_NodeMessage_default_instance_._instance,
@@ -203,21 +206,22 @@ const char descriptor_table_protodef_rpc_2eproto[] ABSL_ATTRIBUTE_SECTION_VARIAB
     "\n\trpc.proto\022\016masterSlaveRPC\032\033google/prot"
     "obuf/empty.proto\"\037\n\013NodeMessage\022\020\n\010nodeN"
     "ame\030\001 \001(\t\"#\n\002Id\022\016\n\006taskId\030\001 \001(\r\022\r\n\005jobId"
-    "\030\002 \001(\r\"p\n\nJobMessage\022&\n\004type\030\001 \001(\0162\030.mas"
-    "terSlaveRPC.TaskType\022\013\n\003key\030\002 \001(\t\022\r\n\005val"
-    "ue\030\003 \001(\t\022\036\n\002id\030\004 \001(\0132\022.masterSlaveRPC.Id"
-    "\"\037\n\013MapDataList\022\020\n\010filename\030\001 \003(\t\"\016\n\014Eve"
-    "ntMessage**\n\010TaskType\022\007\n\003map\020\000\022\n\n\006reduce"
-    "\020\001\022\t\n\005fetch\020\0022\365\002\n\006JobRpc\022G\n\nRequireJob\022\033"
-    ".masterSlaveRPC.NodeMessage\032\032.masterSlav"
-    "eRPC.JobMessage\"\000\022N\n\020FetchDataFromMap\022\033."
-    "masterSlaveRPC.NodeMessage\032\033.masterSlave"
-    "RPC.MapDataList\"\000\022G\n\017ReportJobStatus\022\032.m"
-    "asterSlaveRPC.JobMessage\032\026.google.protob"
-    "uf.Empty\"\000\022E\n\013ReportEvent\022\034.masterSlaveR"
-    "PC.EventMessage\032\026.google.protobuf.Empty\""
-    "\000\022B\n\tHeartBeat\022\033.masterSlaveRPC.NodeMess"
-    "age\032\026.google.protobuf.Empty\"\000b\006proto3"
+    "\030\002 \001(\r\"\200\001\n\nJobMessage\022&\n\004type\030\001 \001(\0162\030.ma"
+    "sterSlaveRPC.TaskType\022\013\n\003key\030\002 \001(\t\022\r\n\005va"
+    "lue\030\003 \001(\t\022\036\n\002id\030\004 \001(\0132\022.masterSlaveRPC.I"
+    "d\022\016\n\006jobnum\030\005 \001(\r\"\037\n\013MapDataList\022\020\n\010file"
+    "name\030\001 \003(\t\"\016\n\014EventMessage**\n\010TaskType\022\007"
+    "\n\003map\020\000\022\n\n\006reduce\020\001\022\t\n\005fetch\020\0022\365\002\n\006JobRp"
+    "c\022G\n\nRequireJob\022\033.masterSlaveRPC.NodeMes"
+    "sage\032\032.masterSlaveRPC.JobMessage\"\000\022N\n\020Fe"
+    "tchDataFromMap\022\033.masterSlaveRPC.NodeMess"
+    "age\032\033.masterSlaveRPC.MapDataList\"\000\022G\n\017Re"
+    "portJobStatus\022\032.masterSlaveRPC.JobMessag"
+    "e\032\026.google.protobuf.Empty\"\000\022E\n\013ReportEve"
+    "nt\022\034.masterSlaveRPC.EventMessage\032\026.googl"
+    "e.protobuf.Empty\"\000\022B\n\tHeartBeat\022\033.master"
+    "SlaveRPC.NodeMessage\032\026.google.protobuf.E"
+    "mpty\"\000b\006proto3"
 };
 static const ::_pbi::DescriptorTable* const descriptor_table_rpc_2eproto_deps[1] =
     {
@@ -227,7 +231,7 @@ static ::absl::once_flag descriptor_table_rpc_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_rpc_2eproto = {
     false,
     false,
-    717,
+    734,
     descriptor_table_protodef_rpc_2eproto,
     "rpc.proto",
     &descriptor_table_rpc_2eproto_once,
@@ -685,7 +689,13 @@ JobMessage::JobMessage(
   _impl_.id_ = (cached_has_bits & 0x00000001u) ? ::google::protobuf::Message::CopyConstruct<::masterSlaveRPC::Id>(
                               arena, *from._impl_.id_)
                         : nullptr;
-  _impl_.type_ = from._impl_.type_;
+  ::memcpy(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, type_),
+           reinterpret_cast<const char *>(&from._impl_) +
+               offsetof(Impl_, type_),
+           offsetof(Impl_, jobnum_) -
+               offsetof(Impl_, type_) +
+               sizeof(Impl_::jobnum_));
 
   // @@protoc_insertion_point(copy_constructor:masterSlaveRPC.JobMessage)
 }
@@ -701,9 +711,9 @@ inline void JobMessage::SharedCtor(::_pb::Arena* arena) {
   ::memset(reinterpret_cast<char *>(&_impl_) +
                offsetof(Impl_, id_),
            0,
-           offsetof(Impl_, type_) -
+           offsetof(Impl_, jobnum_) -
                offsetof(Impl_, id_) +
-               sizeof(Impl_::type_));
+               sizeof(Impl_::jobnum_));
 }
 JobMessage::~JobMessage() {
   // @@protoc_insertion_point(destructor:masterSlaveRPC.JobMessage)
@@ -739,15 +749,15 @@ JobMessage::GetClassData() const {
   return _data_.base();
 }
 PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
-const ::_pbi::TcParseTable<2, 4, 1, 42, 2> JobMessage::_table_ = {
+const ::_pbi::TcParseTable<3, 5, 1, 42, 2> JobMessage::_table_ = {
   {
     PROTOBUF_FIELD_OFFSET(JobMessage, _impl_._has_bits_),
     0, // no _extensions_
-    4, 24,  // max_field_number, fast_idx_mask
+    5, 56,  // max_field_number, fast_idx_mask
     offsetof(decltype(_table_), field_lookup_table),
-    4294967280,  // skipmap
+    4294967264,  // skipmap
     offsetof(decltype(_table_), field_entries),
-    4,  // num_field_entries
+    5,  // num_field_entries
     1,  // num_aux_entries
     offsetof(decltype(_table_), aux_entries),
     &_JobMessage_default_instance_._instance,
@@ -757,9 +767,7 @@ const ::_pbi::TcParseTable<2, 4, 1, 42, 2> JobMessage::_table_ = {
     ::_pbi::TcParser::GetTable<::masterSlaveRPC::JobMessage>(),  // to_prefetch
     #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
   }, {{
-    // .masterSlaveRPC.Id id = 4;
-    {::_pbi::TcParser::FastMtS1,
-     {34, 0, 0, PROTOBUF_FIELD_OFFSET(JobMessage, _impl_.id_)}},
+    {::_pbi::TcParser::MiniParse, {}},
     // .masterSlaveRPC.TaskType type = 1;
     {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(JobMessage, _impl_.type_), 63>(),
      {8, 63, 0, PROTOBUF_FIELD_OFFSET(JobMessage, _impl_.type_)}},
@@ -769,6 +777,14 @@ const ::_pbi::TcParseTable<2, 4, 1, 42, 2> JobMessage::_table_ = {
     // string value = 3;
     {::_pbi::TcParser::FastUS1,
      {26, 63, 0, PROTOBUF_FIELD_OFFSET(JobMessage, _impl_.value_)}},
+    // .masterSlaveRPC.Id id = 4;
+    {::_pbi::TcParser::FastMtS1,
+     {34, 0, 0, PROTOBUF_FIELD_OFFSET(JobMessage, _impl_.id_)}},
+    // uint32 jobnum = 5;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(JobMessage, _impl_.jobnum_), 63>(),
+     {40, 63, 0, PROTOBUF_FIELD_OFFSET(JobMessage, _impl_.jobnum_)}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
   }}, {{
     65535, 65535
   }}, {{
@@ -784,6 +800,9 @@ const ::_pbi::TcParseTable<2, 4, 1, 42, 2> JobMessage::_table_ = {
     // .masterSlaveRPC.Id id = 4;
     {PROTOBUF_FIELD_OFFSET(JobMessage, _impl_.id_), _Internal::kHasBitsOffset + 0, 0,
     (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+    // uint32 jobnum = 5;
+    {PROTOBUF_FIELD_OFFSET(JobMessage, _impl_.jobnum_), -1, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt32)},
   }}, {{
     {::_pbi::TcParser::GetTable<::masterSlaveRPC::Id>()},
   }}, {{
@@ -808,7 +827,9 @@ PROTOBUF_NOINLINE void JobMessage::Clear() {
     ABSL_DCHECK(_impl_.id_ != nullptr);
     _impl_.id_->Clear();
   }
-  _impl_.type_ = 0;
+  ::memset(&_impl_.type_, 0, static_cast<::size_t>(
+      reinterpret_cast<char*>(&_impl_.jobnum_) -
+      reinterpret_cast<char*>(&_impl_.type_)) + sizeof(_impl_.jobnum_));
   _impl_._has_bits_.Clear();
   _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
@@ -848,6 +869,13 @@ PROTOBUF_NOINLINE void JobMessage::Clear() {
   if (cached_has_bits & 0x00000001u) {
     target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
         4, *_impl_.id_, _impl_.id_->GetCachedSize(), target, stream);
+  }
+
+  // uint32 jobnum = 5;
+  if (this->_internal_jobnum() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        5, this->_internal_jobnum(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -893,6 +921,12 @@ PROTOBUF_NOINLINE void JobMessage::Clear() {
                   ::_pbi::WireFormatLite::EnumSize(this->_internal_type());
   }
 
+  // uint32 jobnum = 5;
+  if (this->_internal_jobnum() != 0) {
+    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+        this->_internal_jobnum());
+  }
+
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
@@ -925,6 +959,9 @@ void JobMessage::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::goog
   if (from._internal_type() != 0) {
     _this->_impl_.type_ = from._impl_.type_;
   }
+  if (from._internal_jobnum() != 0) {
+    _this->_impl_.jobnum_ = from._impl_.jobnum_;
+  }
   _this->_impl_._has_bits_[0] |= cached_has_bits;
   _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
@@ -946,8 +983,8 @@ void JobMessage::InternalSwap(JobMessage* PROTOBUF_RESTRICT other) {
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.key_, &other->_impl_.key_, arena);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.value_, &other->_impl_.value_, arena);
   ::google::protobuf::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(JobMessage, _impl_.type_)
-      + sizeof(JobMessage::_impl_.type_)
+      PROTOBUF_FIELD_OFFSET(JobMessage, _impl_.jobnum_)
+      + sizeof(JobMessage::_impl_.jobnum_)
       - PROTOBUF_FIELD_OFFSET(JobMessage, _impl_.id_)>(
           reinterpret_cast<char*>(&_impl_.id_),
           reinterpret_cast<char*>(&other->_impl_.id_));

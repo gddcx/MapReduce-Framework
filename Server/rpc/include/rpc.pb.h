@@ -934,6 +934,7 @@ class JobMessage final : public ::google::protobuf::Message
     kValueFieldNumber = 3,
     kIdFieldNumber = 4,
     kTypeFieldNumber = 1,
+    kJobnumFieldNumber = 5,
   };
   // string key = 2;
   void clear_key() ;
@@ -992,12 +993,22 @@ class JobMessage final : public ::google::protobuf::Message
   void _internal_set_type(::masterSlaveRPC::TaskType value);
 
   public:
+  // uint32 jobnum = 5;
+  void clear_jobnum() ;
+  ::uint32_t jobnum() const;
+  void set_jobnum(::uint32_t value);
+
+  private:
+  ::uint32_t _internal_jobnum() const;
+  void _internal_set_jobnum(::uint32_t value);
+
+  public:
   // @@protoc_insertion_point(class_scope:masterSlaveRPC.JobMessage)
  private:
   class _Internal;
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
-      2, 4, 1,
+      3, 5, 1,
       42, 2>
       _table_;
 
@@ -1024,6 +1035,7 @@ class JobMessage final : public ::google::protobuf::Message
     ::google::protobuf::internal::ArenaStringPtr value_;
     ::masterSlaveRPC::Id* id_;
     int type_;
+    ::uint32_t jobnum_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
   union { Impl_ _impl_; };
@@ -1364,6 +1376,28 @@ inline void JobMessage::set_allocated_id(::masterSlaveRPC::Id* value) {
 
   _impl_.id_ = reinterpret_cast<::masterSlaveRPC::Id*>(value);
   // @@protoc_insertion_point(field_set_allocated:masterSlaveRPC.JobMessage.id)
+}
+
+// uint32 jobnum = 5;
+inline void JobMessage::clear_jobnum() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.jobnum_ = 0u;
+}
+inline ::uint32_t JobMessage::jobnum() const {
+  // @@protoc_insertion_point(field_get:masterSlaveRPC.JobMessage.jobnum)
+  return _internal_jobnum();
+}
+inline void JobMessage::set_jobnum(::uint32_t value) {
+  _internal_set_jobnum(value);
+  // @@protoc_insertion_point(field_set:masterSlaveRPC.JobMessage.jobnum)
+}
+inline ::uint32_t JobMessage::_internal_jobnum() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.jobnum_;
+}
+inline void JobMessage::_internal_set_jobnum(::uint32_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.jobnum_ = value;
 }
 
 // -------------------------------------------------------------------
