@@ -1,6 +1,6 @@
 #pragma once
-#include "Timer.h"
 #include <unordered_map>
+#include "Timer.h"
 
 #define OFFLINE     (0)
 #define ONLINE      (1)
@@ -30,7 +30,7 @@ public:
     int NmGetNodeStatus(std::string nodeName);
     void NmSetNodeStatus(std::string nodeName, int status);
 private:
-    void CheckNodeStatus();
+    void NmCheckNodeStatus();
 public:
     void NmStart();
 };

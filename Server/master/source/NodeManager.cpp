@@ -1,4 +1,5 @@
 #include "NodeManager.h"
+#include <iostream>
 
 void NodeManager::NmMonitorNewNode(uint addr, std::string nodeName)
 {
@@ -31,7 +32,7 @@ void NodeManager::NmSetNodeStatus(std::string nodeName, int status)
     }
 }
 
-void NodeManager::CheckNodeStatus()
+void NodeManager::NmCheckNodeStatus()
 {
     auto node = nodes_.begin();
     for(; node != nodes_.end(); node++)
@@ -42,6 +43,7 @@ void NodeManager::CheckNodeStatus()
         }
         else
         {
+            std::cout << __func__ << " node:" << node->second.nodeName_ << " offline" << std::endl;
             node->second.status_ = OFFLINE;
         }
     }
@@ -49,6 +51,12 @@ void NodeManager::CheckNodeStatus()
 
 void NodeManager::NmStart()
 {
-    int beatCheckInterval = 30;  // TODO:worker必须30s内上报心跳，否则被认为丢失心跳
-    timer_.AddTimer(beatCheckInterval, std::bind(&NodeManager::CheckNodeStatus, this), true);
+    int beatCheckInterval = 20;  // TODO:worker必须20s内上报心跳，否则被认为丢失心跳
+    timer_.AddTimer(beatCheckInterval, std::bind(&NodeManager::NmCheckNodeStatus, this), true);
+
+    for(;;)
+    {
+        timer_.WaitExpired();
+        timer_.RunCallback();
+    }
 }

@@ -38,6 +38,6 @@ void RpcClient::HeartBeat(NodeMessage& nodeMsg)
     Status status = stub_->HeartBeat(&context, nodeMsg, &res);
     if(status.ok())
     {
-        std::cout << nodeMsg.nodename() << ": upload heart bear" << std::endl;
+        std::cout << nodeMsg.nodename() << ": upload heart beat" << std::endl;
     }
 }

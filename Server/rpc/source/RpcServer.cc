@@ -33,10 +33,10 @@ Status RpcServer::RequireJob(ServerContext* context, const NodeMessage* nodeMsg,
     {
         jobMsg->set_key(key);
         jobMsg->set_value(value);
-        jobMsg->set_type(masterSlaveRPC::TaskType::map);
+        jobMsg->set_type(masterSlaveRPC::TaskType::reduce);
         id.set_taskid(taskId);
         id.set_jobid(jobId);
-        jobMsg->set_allocated_id(&id);
+        jobMsg->mutable_id()->CopyFrom(id);
         return Status::OK;
     }
     else if(GetMapJobCallback_(nodeMsg->nodename(), key, value, taskId, jobId, jobNum) == MR_OK)
@@ -46,7 +46,7 @@ Status RpcServer::RequireJob(ServerContext* context, const NodeMessage* nodeMsg,
         jobMsg->set_type(masterSlaveRPC::TaskType::map);
         id.set_taskid(taskId);
         id.set_jobid(jobId);
-        jobMsg->set_allocated_id(&id);
+        jobMsg->mutable_id()->CopyFrom(id);
         jobMsg->set_jobnum(jobNum);
         return Status::OK;
     }

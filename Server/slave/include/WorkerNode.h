@@ -20,7 +20,7 @@ public:
 
 private:
     void ExecuteJob(JobMessage jobMsg);
-    void Partition(std::vector<std::pair<std::string, int>>& mapRes, uint partNum);
+    void Partition(std::vector<std::pair<std::string, int>>& mapRes, uint partNum, uint taskId, uint jobId);
     void LoadPartition(const std::string& filename, std::vector<std::pair<std::string, int>>& partition);
     void FetchIntermediaData(uint& taskId, uint& jobId, std::string& filename, std::vector<std::string>& filenameVec);
     void Merge(std::vector<std::pair<std::string, int>>& partition, std::unordered_map<std::string, int>& res);

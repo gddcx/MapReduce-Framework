@@ -1,5 +1,11 @@
 #include <iostream>
 #include "JobManager.h"
+#include "Timer.h"
+
+void JobManager::JmSetNodeManager(NodeManager& nodeManager)
+{
+    nodeManager_ = nodeManager;
+}
 
 uint JobManager::JmAddNewTask(std::vector<std::string>& keys, std::vector<std::string>& values, int reduceJobNum)
 {
@@ -26,6 +32,7 @@ uint JobManager::JmAddNewTask(std::vector<std::string>& keys, std::vector<std::s
     }
     taskDesp.noStartReduceJobNum_ = taskDesp.reduceJob_.size();
 
+    std::lock_guard<std::mutex> lock(taskMutex_);
     tasks_.emplace(std::make_pair(taskId_, taskDesp));
 
     return taskId_++;
@@ -33,6 +40,8 @@ uint JobManager::JmAddNewTask(std::vector<std::string>& keys, std::vector<std::s
 
 bool JobManager::JmAllocMapJob(std::string& nodeName, std::string& key, std::string& value, uint& taskId, uint& jobId, uint& reduceJobNum)
 {
+    std::lock_guard<std::mutex> lock(taskMutex_);
+
     auto taskIt = tasks_.begin();
     for(; taskIt != tasks_.end(); taskIt++)
     {
@@ -61,6 +70,8 @@ bool JobManager::JmAllocMapJob(std::string& nodeName, std::string& key, std::str
 
 bool JobManager::JmAllocReduceJob(std::string& nodeName, std::string& key, std::string& value, uint& taskId, uint& jobId)
 {
+    std::lock_guard<std::mutex> lock(taskMutex_);
+
     auto taskIt = tasks_.begin();
     for(; taskIt != tasks_.end(); taskIt++)
     {
@@ -75,7 +86,7 @@ bool JobManager::JmAllocReduceJob(std::string& nodeName, std::string& key, std::
                     jobDesp->second.workerNodeName_ = nodeName;
                     key = jobDesp->second.key_;
                     value = jobDesp->second.value_;
-                    taskId = jobDesp->first;
+                    taskId = taskIt->first;
                     jobId = jobDesp->first;
                     taskIt->second.noStartReduceJobNum_--;
                     return MR_OK;
@@ -88,6 +99,8 @@ bool JobManager::JmAllocReduceJob(std::string& nodeName, std::string& key, std::
 
 void JobManager::JmChangeJobStatus(JobType JobType, uint taskId, uint jobId)
 {
+    std::lock_guard<std::mutex> lock(taskMutex_);
+
     const auto& task = tasks_.find(taskId);
     if(task != tasks_.end())
     {
@@ -119,7 +132,49 @@ void JobManager::JmChangeJobStatus(JobType JobType, uint taskId, uint jobId)
             {
                 task->second.finishedReduceJobNum_++;
                 job->second.status_ = JOB_FINISHED;
+                task->second.reduceJob_.erase(job);
             }
         }
+    }
+}
+
+void JobManager::JmCheckDeadTask()
+{
+    std::lock_guard<std::mutex> lock(taskMutex_);
+
+    uint taskId = 0;
+    for(auto& task: tasks_)
+    {
+        taskId = task.first;
+        TaskDesp& taskdesp = task.second;
+        for(auto& mpJob: taskdesp.mapJob_)
+        {
+            if((!mpJob.second.workerNodeName_.empty()) && (nodeManager_.NmGetNodeStatus(mpJob.second.workerNodeName_) == OFFLINE))
+            {
+                mpJob.second.status_ = JOB_NO_START;
+                task.second.noStartMapJobNum_++;
+            }
+        }
+        for(auto& reduceJob: taskdesp.reduceJob_)
+        {
+            if((!reduceJob.second.workerNodeName_.empty()) && (nodeManager_.NmGetNodeStatus(reduceJob.second.workerNodeName_) == OFFLINE))
+            {
+                reduceJob.second.status_ = JOB_NO_START;
+                task.second.noStartReduceJobNum_++;
+            }
+        }
+    }
+}
+
+void JobManager::JmMonitorStart()
+{
+    Timer timer;
+    int interval = 10;
+    timer.AddTimer(interval, std::bind(&JobManager::JmCheckDeadTask, this), true);
+
+    for(;;)
+    {
+        timer.WaitExpired();
+        timer.RunCallback();
     }
 }

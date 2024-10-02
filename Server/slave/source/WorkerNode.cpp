@@ -90,7 +90,7 @@ void WorkerNode::ExecuteJob(JobMessage jobMsg)
             std::string cmd = "mkdir -p " + std::string(INTERMEDIATE_FOLDER) + std::to_string(taskId) + "/" + std::to_string(jobId);
             system(cmd.c_str());
             mapRes = mrObj_->Map(key, value);
-            Partition(mapRes, jobNum);
+            Partition(mapRes, jobNum, taskId, jobId);
             break;
         }
         case TaskType::reduce:
@@ -118,7 +118,7 @@ void WorkerNode::ExecuteJob(JobMessage jobMsg)
     rpcClient_->JobFinished(jobMsg);
 }
 
-void WorkerNode::Partition(std::vector<std::pair<std::string, int>>& mapRes, uint partNum)
+void WorkerNode::Partition(std::vector<std::pair<std::string, int>>& mapRes, uint partNum, uint taskId, uint jobId)
 {   
     std::vector<std::vector<std::pair<std::string, int>>> partitions(partNum);
     std::vector<std::pair<std::string, int>>::const_iterator it;
@@ -131,9 +131,10 @@ void WorkerNode::Partition(std::vector<std::pair<std::string, int>>& mapRes, uin
     std::ofstream fd;
     std::size_t size;
     std::size_t pairStrSize;
+    std::string folder = INTERMEDIATE_FOLDER + std::to_string(taskId) + "/" + std::to_string(jobId) + "/";
     for(int reducerId = 0; reducerId < partNum; reducerId++)
     {   
-        filename << INTERMEDIATE_FILE_PREFIX << reducerId << INTERMEDIATE_FILE_SUBFIX;
+        filename << folder << INTERMEDIATE_FILE_PREFIX << reducerId << INTERMEDIATE_FILE_SUBFIX;
         fd.open(filename.str(), std::ios::out | std::ios::binary);
         size = partitions[reducerId].size();
         if(size != 0)

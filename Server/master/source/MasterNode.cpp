@@ -5,11 +5,26 @@
 MasterNode::MasterNode(std::string rpcListen)
 {
     rpcServer_ = new RpcServer(rpcListen);
+    jobManager_.JmSetNodeManager(nodeManager_);
+    StartJobManager();
+    StartNodeManager();
 }
 
 MasterNode::~MasterNode()
 {
     if(rpcServer_) delete rpcServer_;
+}
+
+void MasterNode::StartJobManager()
+{
+    std::thread jobManagerThread(&JobManager::JmMonitorStart, &jobManager_);
+    jobManagerThread.detach();
+}
+
+void MasterNode::StartNodeManager()
+{
+    std::thread nodeManagerThread(&NodeManager::NmStart, &nodeManager_);
+    nodeManagerThread.detach();
 }
 
 void MasterNode::AddJob(std::vector<std::string>& keys, std::vector<std::string>& values, int reduceJobNum)
@@ -25,7 +40,7 @@ void MasterNode::ChangeJobStatus(int jobType, uint taskId, uint jobId)
 
 bool MasterNode::GetMapJob(std::string nodeName, std::string& key, std::string& value, uint& taskId, uint& jobId, uint& reduceJobNum)
 {
-    if(jobManager_.JmAllocMapJob(key, value, nodeName, taskId, jobId, reduceJobNum) == MR_OK)
+    if(jobManager_.JmAllocMapJob(nodeName, key, value, taskId, jobId, reduceJobNum) == MR_OK)
     {
         nodeManager_.NmMonitorNewNode(0x7f000001, nodeName); // TODO：临时写入地址127.0.0.1
         return MR_OK;
@@ -35,7 +50,7 @@ bool MasterNode::GetMapJob(std::string nodeName, std::string& key, std::string& 
 
 bool MasterNode::GetReduceJob(std::string nodeName, std::string& key, std::string& value, uint& taskId, uint& jobId)
 {
-    if(jobManager_.JmAllocReduceJob(key, value, nodeName, taskId, jobId) == MR_OK)
+    if(jobManager_.JmAllocReduceJob(nodeName, key, value, taskId, jobId) == MR_OK)
     {
         nodeManager_.NmMonitorNewNode(0x7f000001, nodeName); // TODO：临时写入地址127.0.0.1
         return MR_OK;

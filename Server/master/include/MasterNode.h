@@ -12,6 +12,8 @@ private:
     RpcServer *rpcServer_ = nullptr;
     NodeManager nodeManager_;
     JobManager jobManager_;
+    void StartJobManager();
+    void StartNodeManager();
 public:
     MasterNode(std::string rpcListen);
     ~MasterNode();
