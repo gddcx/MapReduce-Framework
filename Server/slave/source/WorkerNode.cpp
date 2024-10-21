@@ -48,9 +48,9 @@ int WorkerNode::LoadCustomizedMapReduce(const std::string& libPath)
     return 0;
 }
 
-void WorkerNode::CreateRpcClient(std::string& target)
+void WorkerNode::SetRpcServer(std::string target)
 {
-    rpcClient_ = new RpcClient(target);
+    target_ = target;
 }
 
 void WorkerNode::RequireJob()
@@ -87,6 +87,7 @@ void WorkerNode::ExecuteJob(JobMessage jobMsg)
     {
         case TaskType::map:
         {
+            std::cout << __func__ << ": start [map] job, taskId: " << taskId << ", jobId: " << jobId << ", key: " << key << ", value: " << value << std::endl;
             std::string cmd = "mkdir -p " + std::string(INTERMEDIATE_FOLDER) + std::to_string(taskId) + "/" + std::to_string(jobId);
             system(cmd.c_str());
             mapRes = mrObj_->Map(key, value);
@@ -95,12 +96,13 @@ void WorkerNode::ExecuteJob(JobMessage jobMsg)
         }
         case TaskType::reduce:
         {
+            std::cout << __func__ << ": start [reduce] job, taskId: " << taskId << ", jobId: " << jobId << ", key: " << key << ", value: " << value << std::endl;
             std::vector<std::pair<std::string, int>> partition;
             std::unordered_map<std::string, int> res;
             std::vector<std::string> filenameVec;
             std::vector<std::string> keys;
             std::vector<int> values;
-            FetchIntermediaData(taskId, jobId, key, filenameVec);
+            FetchIntermediaData(taskId, jobNum, key, filenameVec);
             for(auto& filename: filenameVec)
             {
                 LoadPartition(filename, partition);
@@ -115,6 +117,7 @@ void WorkerNode::ExecuteJob(JobMessage jobMsg)
         default:
             break;
     }
+    std::cout << __func__ << ": finish job, taskId: " << taskId << ", jobId: " << jobId << std::endl;
     rpcClient_->JobFinished(jobMsg);
 }
 
@@ -134,11 +137,11 @@ void WorkerNode::Partition(std::vector<std::pair<std::string, int>>& mapRes, uin
     std::string folder = INTERMEDIATE_FOLDER + std::to_string(taskId) + "/" + std::to_string(jobId) + "/";
     for(int reducerId = 0; reducerId < partNum; reducerId++)
     {   
-        filename << folder << INTERMEDIATE_FILE_PREFIX << reducerId << INTERMEDIATE_FILE_SUBFIX;
-        fd.open(filename.str(), std::ios::out | std::ios::binary);
         size = partitions[reducerId].size();
         if(size != 0)
         {
+            filename << folder << INTERMEDIATE_FILE_PREFIX << reducerId << INTERMEDIATE_FILE_SUBFIX;
+            fd.open(filename.str(), std::ios::out | std::ios::binary);
             fd.write(reinterpret_cast<const char*>(&size), sizeof(size));
             for(const auto& pair: partitions[reducerId])
             {
@@ -147,9 +150,9 @@ void WorkerNode::Partition(std::vector<std::pair<std::string, int>>& mapRes, uin
                 fd.write(pair.first.c_str(), pairStrSize);
                 fd.write(reinterpret_cast<const char*>(&pair.second), sizeof(pair.second));
             }
+            fd.close();
+            filename.str("");
         }
-        fd.close();
-        filename.str("");
     }
 }
 
@@ -160,6 +163,11 @@ void WorkerNode::LoadPartition(const std::string& filename, std::vector<std::pai
     std::size_t tmpStrSize;
 
     fd.open(filename, std::ios::in | std::ios::binary);
+    if(!fd)
+    {
+        std::cout << __func__ << ": fail to open file, filename=" << filename << std::endl;
+        return;
+    }
     fd.read(reinterpret_cast<char*>(&size), sizeof(size));
     partition.resize(size);
     for(auto& pair: partition)
@@ -172,10 +180,10 @@ void WorkerNode::LoadPartition(const std::string& filename, std::vector<std::pai
     fd.close();
 }
 
-void WorkerNode::FetchIntermediaData(uint& taskId, uint& jobId, std::string& filename, std::vector<std::string>& filenameVec)
+void WorkerNode::FetchIntermediaData(uint& taskId, uint& jobNum, std::string& filename, std::vector<std::string>& filenameVec)
 {
     std::string path = INTERMEDIATE_FOLDER + std::to_string(taskId) + "/";
-    for(int loop = 0; loop < jobId; loop++)
+    for(int loop = 0; loop < jobNum; loop++)
     {
         filenameVec.emplace_back(path + std::to_string(loop) + "/" + filename);
     }
@@ -190,12 +198,14 @@ void WorkerNode::HeartBeat()
 
 void WorkerNode::StartWorkerNode(std::string libPath)
 {
+    rpcClient_ = new RpcClient(target_);
+    
     if(LoadCustomizedMapReduce(libPath) == -1)
     {
         std::cout << "not found MapReduce dll" << std::endl;
         return;
     }
-
+    std::cout << __func__ << ": start worker node = " << nodeName_ << std::endl;
     Timer timer;
     timer.AddTimer(5000, std::bind(&WorkerNode::HeartBeat, this), true); /* 5000ms上报心跳 */
     timer.AddTimer(2000, std::bind(&WorkerNode::RequireJob, this), true); /* busy不要请求任务 */

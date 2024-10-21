@@ -36,8 +36,4 @@ void RpcClient::HeartBeat(NodeMessage& nodeMsg)
     google::protobuf::Empty res;
 
     Status status = stub_->HeartBeat(&context, nodeMsg, &res);
-    if(status.ok())
-    {
-        std::cout << nodeMsg.nodename() << ": upload heart beat" << std::endl;
-    }
 }

@@ -18,7 +18,7 @@ using masterSlaveRPC::Id;
 class RpcClient
 {
 private:
-    std::unique_ptr<JobRpc::Stub> stub_;
+    std::unique_ptr<JobRpc::Stub> stub_ = nullptr;
 public:
     RpcClient(std::string& target);
     bool Require(NodeMessage& nodeMsg, JobMessage& jobMsg);

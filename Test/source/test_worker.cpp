@@ -13,9 +13,10 @@ int main(int argc, char* argv[])
     std::string target = "127.0.0.1:50031";
     WorkerNode workerNode;
 
-    workerNode.CreateRpcClient(target);
+    workerNode.SetRpcServer(target);
     workerNode.SetNodeName(std::string(argv[1]));
-    workerNode.StartWorkerNode();
+    std::string libFile = "/home/dengchangxing/projects/MIT6824/Test/scripts/MapReduce.so";
+    workerNode.StartWorkerNode(libFile);
 
     return 0;
 }

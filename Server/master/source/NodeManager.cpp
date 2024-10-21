@@ -51,7 +51,7 @@ void NodeManager::NmCheckNodeStatus()
 
 void NodeManager::NmStart()
 {
-    int beatCheckInterval = 20;  // TODO:worker必须20s内上报心跳，否则被认为丢失心跳
+    int beatCheckInterval = 20000;  // TODO:worker必须20s内上报心跳，否则被认为丢失心跳
     timer_.AddTimer(beatCheckInterval, std::bind(&NodeManager::NmCheckNodeStatus, this), true);
 
     for(;;)

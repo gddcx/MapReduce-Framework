@@ -29,7 +29,7 @@ Status RpcServer::RequireJob(ServerContext* context, const NodeMessage* nodeMsg,
     uint jobId;
     Id id;
     uint jobNum = 0;
-    if(GetReduceJobCallback_(nodeMsg->nodename(), key, value, taskId, jobId) == MR_OK)
+    if(GetReduceJobCallback_(nodeMsg->nodename(), key, value, taskId, jobId, jobNum) == MR_OK)
     {
         jobMsg->set_key(key);
         jobMsg->set_value(value);
@@ -37,6 +37,7 @@ Status RpcServer::RequireJob(ServerContext* context, const NodeMessage* nodeMsg,
         id.set_taskid(taskId);
         id.set_jobid(jobId);
         jobMsg->mutable_id()->CopyFrom(id);
+        jobMsg->set_jobnum(jobNum);
         return Status::OK;
     }
     else if(GetMapJobCallback_(nodeMsg->nodename(), key, value, taskId, jobId, jobNum) == MR_OK)
@@ -77,7 +78,7 @@ void RpcServer::SetGetMapJobCallback(std::function<bool(std::string, std::string
     GetMapJobCallback_ = GetMapJobCallback;
 }
 
-void RpcServer::SetGetReduceJobCallback(std::function<bool(std::string, std::string&, std::string&, uint&, uint&)> GetReduceJobCallback)
+void RpcServer::SetGetReduceJobCallback(std::function<bool(std::string, std::string&, std::string&, uint&, uint&, uint&)> GetReduceJobCallback)
 {
     GetReduceJobCallback_ = GetReduceJobCallback;
 }

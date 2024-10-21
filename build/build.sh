@@ -29,7 +29,9 @@ cd ${TEST_TMP_DIR}
 cmake ${TEST_CMAKE_DIR} \
 -G "Unix Makefiles" \
 -DROOT_DIR=${ROOT_DIR} \
--DCMAKE_DIR=${CMAKE_DIR} \
--DMR_LIB=${SERVER_INSTALL_DIR} # 临时使用
+-DCMAKE_DIR=${CMAKE_DIR}
 
 make -j4
+
+# ============= Client编译 ============= #
+g++ -shared -fPIC -o "${TEST_TMP_DIR}/MapReduce.so" "${ROOT_DIR}/Test/source/MapReduce.cpp" 

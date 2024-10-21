@@ -9,6 +9,7 @@ class WorkerNode
 {
 private:
     std::string nodeName_ = "";
+    std::string target_ = "";
     RpcClient* rpcClient_ = nullptr;
     void* handle_ = nullptr;
     MapReduceBase* mrObj_ = nullptr;
@@ -22,11 +23,11 @@ private:
     void ExecuteJob(JobMessage jobMsg);
     void Partition(std::vector<std::pair<std::string, int>>& mapRes, uint partNum, uint taskId, uint jobId);
     void LoadPartition(const std::string& filename, std::vector<std::pair<std::string, int>>& partition);
-    void FetchIntermediaData(uint& taskId, uint& jobId, std::string& filename, std::vector<std::string>& filenameVec);
+    void FetchIntermediaData(uint& taskId, uint& jobNum, std::string& filename, std::vector<std::string>& filenameVec);
     void Merge(std::vector<std::pair<std::string, int>>& partition, std::unordered_map<std::string, int>& res);
 public:
     ~WorkerNode();
-    void CreateRpcClient(std::string& target);
+    void SetRpcServer(std::string target);
     void RequireJob();
     void HeartBeat();
     void StartWorkerNode(std::string libPath);

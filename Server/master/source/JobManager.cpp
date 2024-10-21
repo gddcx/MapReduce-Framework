@@ -2,7 +2,7 @@
 #include "JobManager.h"
 #include "Timer.h"
 
-void JobManager::JmSetNodeManager(NodeManager& nodeManager)
+void JobManager::JmSetNodeManager(NodeManager* nodeManager)
 {
     nodeManager_ = nodeManager;
 }
@@ -68,7 +68,7 @@ bool JobManager::JmAllocMapJob(std::string& nodeName, std::string& key, std::str
     return MR_ERROR;
 }
 
-bool JobManager::JmAllocReduceJob(std::string& nodeName, std::string& key, std::string& value, uint& taskId, uint& jobId)
+bool JobManager::JmAllocReduceJob(std::string& nodeName, std::string& key, std::string& value, uint& taskId, uint& jobId, uint& mapJobNum)
 {
     std::lock_guard<std::mutex> lock(taskMutex_);
 
@@ -88,6 +88,7 @@ bool JobManager::JmAllocReduceJob(std::string& nodeName, std::string& key, std::
                     value = jobDesp->second.value_;
                     taskId = taskIt->first;
                     jobId = jobDesp->first;
+                    mapJobNum = taskIt->second.mapJob_.size();
                     taskIt->second.noStartReduceJobNum_--;
                     return MR_OK;
                 }
@@ -134,6 +135,10 @@ void JobManager::JmChangeJobStatus(JobType JobType, uint taskId, uint jobId)
                 job->second.status_ = JOB_FINISHED;
                 task->second.reduceJob_.erase(job);
             }
+            if(task->second.finishedReduceJobNum_ == reduceJob.size())
+            {
+                tasks_.erase(task);
+            }
         }
     }
 }
@@ -149,7 +154,7 @@ void JobManager::JmCheckDeadTask()
         TaskDesp& taskdesp = task.second;
         for(auto& mpJob: taskdesp.mapJob_)
         {
-            if((!mpJob.second.workerNodeName_.empty()) && (nodeManager_.NmGetNodeStatus(mpJob.second.workerNodeName_) == OFFLINE))
+            if((!mpJob.second.workerNodeName_.empty()) && (nodeManager_->NmGetNodeStatus(mpJob.second.workerNodeName_) == OFFLINE))
             {
                 mpJob.second.status_ = JOB_NO_START;
                 task.second.noStartMapJobNum_++;
@@ -157,7 +162,7 @@ void JobManager::JmCheckDeadTask()
         }
         for(auto& reduceJob: taskdesp.reduceJob_)
         {
-            if((!reduceJob.second.workerNodeName_.empty()) && (nodeManager_.NmGetNodeStatus(reduceJob.second.workerNodeName_) == OFFLINE))
+            if((!reduceJob.second.workerNodeName_.empty()) && (nodeManager_->NmGetNodeStatus(reduceJob.second.workerNodeName_) == OFFLINE))
             {
                 reduceJob.second.status_ = JOB_NO_START;
                 task.second.noStartReduceJobNum_++;
@@ -169,7 +174,7 @@ void JobManager::JmCheckDeadTask()
 void JobManager::JmMonitorStart()
 {
     Timer timer;
-    int interval = 10;
+    int interval = 10000;
     timer.AddTimer(interval, std::bind(&JobManager::JmCheckDeadTask, this), true);
 
     for(;;)

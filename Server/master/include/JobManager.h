@@ -53,12 +53,12 @@ private:
     uint taskId_ = 0;
     std::unordered_map<uint, TaskDesp> tasks_;
     std::mutex taskMutex_;
-    NodeManager nodeManager_;
+    NodeManager* nodeManager_;
 public:
-    void JmSetNodeManager(NodeManager& nodeManager);
+    void JmSetNodeManager(NodeManager* nodeManager);
     uint JmAddNewTask(std::vector<std::string>& keys, std::vector<std::string>& values, int reduceJobNum);
     bool JmAllocMapJob(std::string& nodeName, std::string& key, std::string& value, uint& taskId, uint& jobId, uint& reduceJobNum);
-    bool JmAllocReduceJob(std::string& nodeName, std::string& key, std::string& value, uint& taskId, uint& jobId);
+    bool JmAllocReduceJob(std::string& nodeName, std::string& key, std::string& value, uint& taskId, uint& jobId, uint& mapJobNum);
     void JmChangeJobStatus(JobType JobType, uint taskId, uint jobId);
     void JmCheckDeadTask();
     void JmMonitorStart();

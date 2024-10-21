@@ -31,13 +31,13 @@ public:
     void RunRpcServer();
 private:
     std::function<bool(std::string, std::string&, std::string&, uint&, uint&, uint&)> GetMapJobCallback_;
-    std::function<bool(std::string, std::string&, std::string&, uint&, uint&)> GetReduceJobCallback_;
+    std::function<bool(std::string, std::string&, std::string&, uint&, uint&, uint&)> GetReduceJobCallback_;
     std::function<void(int, uint, uint)> ChangeWorkStatusCallback_;
     std::function<std::vector<std::string>(std::string)> GetIntermediateFileCallback_;
     std::function<void(std::string&)> HeartBeatCallback_;
 public:
     void SetGetMapJobCallback(std::function<bool(std::string, std::string&, std::string&, uint&, uint&, uint&)>);
-    void SetGetReduceJobCallback(std::function<bool(std::string, std::string&, std::string&, uint&, uint&)>);
+    void SetGetReduceJobCallback(std::function<bool(std::string, std::string&, std::string&, uint&, uint&, uint&)>);
     void SetChangeJobStatusCallback(std::function<void(int, uint, uint)>);
     void SetGetIntermediateFileCallback(std::function<std::vector<std::string>(std::string)>);
     void SetHeartBeatCallback(std::function<void(std::string&)>);

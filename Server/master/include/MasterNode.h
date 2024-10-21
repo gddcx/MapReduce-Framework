@@ -20,7 +20,7 @@ public:
     void AddJob(std::vector<std::string>& keys, std::vector<std::string>& values, int reduceJobNum);
     void ChangeJobStatus(int jobType, uint taskId, uint jobId);
     bool GetMapJob(std::string nodeName, std::string& key, std::string& value, uint& taskId, uint& jobId, uint& reduceJobNum);
-    bool GetReduceJob(std::string nodeName, std::string& key, std::string& value, uint& taskId, uint& jobId);
+    bool GetReduceJob(std::string nodeName, std::string& key, std::string& value, uint& taskId, uint& jobId, uint& mapJobNum);
     void HeartBeatDetect(std::string& nodeName);
     void StartMasterNode();
 };
