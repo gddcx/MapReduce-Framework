@@ -3,7 +3,7 @@
 #include "RpcClient.h"
 #include "MapReduceBase.h"
 
-#define INTERMEDIATE_FOLDER   "/home/dengchangxing/projects/MIT6824/Test/intermediate/"
+#define INTERMEDIATE_FOLDER   "/home/dengchangxing/projects/MapReduceFramework/Test/intermediate/"
 
 class WorkerNode
 {

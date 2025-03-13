@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
 
     workerNode.SetRpcServer(target);
     workerNode.SetNodeName(std::string(argv[1]));
-    std::string libFile = "/home/dengchangxing/projects/MIT6824/Test/scripts/MapReduce.so";
+    std::string libFile = "/home/dengchangxing/projects/MapReduceFramework/Test/scripts/MapReduce.so";
     workerNode.StartWorkerNode(libFile);
 
     return 0;

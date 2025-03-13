@@ -7,12 +7,13 @@ set(CMAKE_CXX_FLAGS "-std=c++14 -Wall -O3")
 set(TEST_DIR ${ROOT_DIR}/Test)
 set(SOURCE_DIR ${TEST_DIR}/source)
 
-# 临时使用，之后要切到Client的目录。只给用户暴漏Client的库
+# 临时使用，之后要切到Client的目录。只给用户暴露Client的库
 set(MAPREDUCE_LIB ${ROOT_DIR}/Server)
 include_directories(${MAPREDUCE_LIB}/master/include)
 include_directories(${MAPREDUCE_LIB}/slave/include)
 include_directories(${MAPREDUCE_LIB}/rpc/include)
 include_directories(${MAPREDUCE_LIB}/common/include)
+include_directories(${ROOT_DIR}/Client/include)
 
 include(${ROOT_DIR}/build/cmake/Server/cmake/rpc/common.cmake)
 

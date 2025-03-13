@@ -52,6 +52,12 @@ bool JobManager::JmAllocMapJob(std::string& nodeName, std::string& key, std::str
             {
                 if(jobDesp->second.status_ == JOB_NO_START)
                 {
+                    /* 不是这个jobDesp所在节点进行的任务申请, 等JOB_WAIT_TIME次，如果JobDesp所在节点还不来申请任务, 就不再等待 */
+                    if((jobDesp->second.jobBestNode_.nodeName_ != nodeName) && (jobDesp->second.jobBestNode_.requiedCnt_ < JOB_WAIT_TIME))
+                    {
+                        jobDesp->second.jobBestNode_.requiedCnt_++;
+                        continue;
+                    }
                     jobDesp->second.status_ = JOB_RUNNNING;
                     jobDesp->second.workerNodeName_ = nodeName;
                     key = jobDesp->second.key_;
@@ -157,6 +163,7 @@ void JobManager::JmCheckDeadTask()
             if((!mpJob.second.workerNodeName_.empty()) && (nodeManager_->NmGetNodeStatus(mpJob.second.workerNodeName_) == OFFLINE))
             {
                 mpJob.second.status_ = JOB_NO_START;
+                mpJob.second.jobBestNode_.requiedCnt_ = 0;
                 task.second.noStartMapJobNum_++;
             }
         }
